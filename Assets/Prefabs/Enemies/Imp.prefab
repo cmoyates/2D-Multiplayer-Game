@@ -14,9 +14,10 @@ GameObject:
   - component: {fileID: 8697233795510432166}
   - component: {fileID: 800541553}
   - component: {fileID: 2733675600076122380}
+  - component: {fileID: 3512814989362064324}
   m_Layer: 0
   m_Name: Imp
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -77,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 9bdb318b9aa263d41813a38a9d084aea, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -170,6 +171,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nameText: {fileID: 2014371846681682740}
+--- !u!114 &3512814989362064324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064152351526514116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96be9ccdda2e5434284519d8c6562bfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 2
+  steeringScale: 1.88
+  health: 3
 --- !u!1 &3494349292461281707
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@
                     "type": "Value",
                     "id": "0105bdd9-7d73-45ee-b4e7-9f0fc2901f4b",
                     "expectedControlType": "Vector2",
-                    "processors": "NormalizeVector2,StickDeadzone",
+                    "processors": "StickDeadzone,NormalizeVector2",
                     "interactions": "",
                     "initialStateCheck": true
                 },
@@ -19,7 +19,7 @@
                     "type": "Value",
                     "id": "a76532ea-18f9-4ec2-9720-d16ab2f9f1a5",
                     "expectedControlType": "Vector2",
-                    "processors": "NormalizeVector2",
+                    "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
                 }
@@ -162,7 +162,7 @@
                     "id": "3aa4e516-708e-4d65-9bf4-1d86d3df4dcc",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "StickDeadzone,NormalizeVector2",
                     "groups": "Gamepad",
                     "action": "Aim",
                     "isComposite": false,
