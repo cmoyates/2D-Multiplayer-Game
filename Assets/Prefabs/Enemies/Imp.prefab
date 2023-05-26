@@ -183,9 +183,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96be9ccdda2e5434284519d8c6562bfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
-  steeringScale: 1.88
+  moveSpeed: 14
+  steeringScale: 0.1
   health: 3
+  screenShakeDuration: 0.05
+  screenShakeMagnitude: 2
 --- !u!1 &3494349292461281707
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,29 +4,41 @@ using UnityEngine;
 
 public class BulletScript : MonoBehaviour
 {
+    Collider2D col;
     // Start is called before the first frame update
     void Start()
     {
-        
+        col = GetComponent<Collider2D>();
+        StartCoroutine("Lifetime");
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Enemy")) 
+        if (collision.collider.CompareTag("Enemy"))
         {
-            collision.GetComponent<EnemyAI>().Hurt();
+            collision.collider.GetComponent<EnemyAI>().Hurt();
         }
-        
-        
-        if (!collision.CompareTag("Player"))
+
+
+        //if (!collision.collider.CompareTag("Player"))
+        //{
+        //    
+        //}
+
+        Destroy(this.gameObject);
+    }
+
+    IEnumerator Lifetime() 
+    {
+        yield return new WaitForSeconds(5);
+        Destroy(this.gameObject);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player") || collision.CompareTag("Enemy")) 
         {
-            Destroy(this.gameObject);
+            col.isTrigger = false;
         }
     }
 }

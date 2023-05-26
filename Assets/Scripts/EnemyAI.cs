@@ -13,6 +13,9 @@ public class EnemyAI : MonoBehaviour
     Animator anim;
     public int health = 3;
     Material mat;
+    Collider2D col;
+    public float screenShakeDuration = 0.05f;
+    public float screenShakeMagnitude = 0.05f;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +24,7 @@ public class EnemyAI : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        col = GetComponent<Collider2D>();
         mat = sr.material;
 
         gridOffset = new Vector2Int(pathfinder.floor.origin.x, pathfinder.floor.origin.y);
@@ -68,6 +72,7 @@ public class EnemyAI : MonoBehaviour
 
     public IEnumerator TakeDamage() 
     {
+        ScreenShake.Instance.Shake(screenShakeDuration, screenShakeMagnitude);
         mat.SetInt("_Hurt", 1);
         Time.timeScale = 0;
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
@@ -83,11 +88,27 @@ public class EnemyAI : MonoBehaviour
 
         if (health == 0)
         {
-            Destroy(gameObject);
+            StartCoroutine("Die");
         }
         else 
         {
             StartCoroutine("TakeDamage");
         }
+    }
+
+    IEnumerator Die()
+    {
+        ScreenShake.Instance.Shake(screenShakeDuration * 3, screenShakeMagnitude);
+        mat.SetInt("_Hurt", 1);
+        rb.velocity = Vector2.zero;
+        anim.speed = 0;
+        col.enabled = false;
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
+        Time.timeScale = 1;
+        //Instantiate(explosionPrefab, transform.position, Quaternion.Euler(90, 0, 0));
+
+        Destroy(gameObject);
+        yield return null;
     }
 }
