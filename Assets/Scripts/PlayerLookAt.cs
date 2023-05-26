@@ -7,6 +7,8 @@ public class PlayerLookAt : MonoBehaviour
 {
     Vector2 aim;
     public bool isKeyboard = true;
+    public GameObject bulletPrefab;
+    public float bulletForce = 1.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -44,5 +46,29 @@ public class PlayerLookAt : MonoBehaviour
         // Check if the player is using a keyboard
         isKeyboard = playerInput.currentControlScheme.Equals("Keyboard");
         Debug.Log("Now playing using: " + playerInput.currentControlScheme);
+    }
+
+    public void TriggerShoot(InputAction.CallbackContext context)
+    {
+        // When shoot button pressed and it's not an AI controlled game
+        if (context.performed)
+        {
+            // Shoot in that direction
+            Shoot(aim);
+        }
+    }
+
+    public void Shoot(Vector2 lookDir)
+    {
+        // Play the shooting sound and shake the screen
+        //audioSource.PlayOneShot(audioSource.clip);
+        //StartCoroutine(ss.Shake(shakeDuration, shakeMagnitude));
+
+        // Spawn the bullet
+        lookDir *= 0.5f;
+        GameObject bullet = Instantiate(bulletPrefab, new Vector3(lookDir.x + transform.position.x, lookDir.y + transform.position.y, 0), Quaternion.identity);
+        // Add the appropriate force to the bullet
+        Rigidbody2D bulletRB = bullet.GetComponent<Rigidbody2D>();
+        bulletRB.AddForce(lookDir * bulletForce, ForceMode2D.Impulse);
     }
 }

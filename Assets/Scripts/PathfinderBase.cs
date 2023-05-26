@@ -39,10 +39,4 @@ public class PathfinderBase : MonoBehaviour
 
         Debug.Log(tileCount);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

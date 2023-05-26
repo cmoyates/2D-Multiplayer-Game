@@ -12,6 +12,7 @@ public class EnemyAI : MonoBehaviour
     SpriteRenderer sr;
     Animator anim;
     public int health = 3;
+    Material mat;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +21,7 @@ public class EnemyAI : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        mat = sr.material;
 
         gridOffset = new Vector2Int(pathfinder.floor.origin.x, pathfinder.floor.origin.y);
     }
@@ -62,5 +64,30 @@ public class EnemyAI : MonoBehaviour
 
         // Update the animation speed
         anim.SetFloat("Speed", rb.velocity.magnitude);
+    }
+
+    public IEnumerator TakeDamage() 
+    {
+        mat.SetInt("_Hurt", 1);
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
+        Time.timeScale = 1;
+        mat.SetInt("_Hurt", 0);
+    }
+
+    public void Hurt() 
+    {
+        health--;
+
+        Debug.Log(gameObject.name + " Health: " + health);
+
+        if (health == 0)
+        {
+            Destroy(gameObject);
+        }
+        else 
+        {
+            StartCoroutine("TakeDamage");
+        }
     }
 }
