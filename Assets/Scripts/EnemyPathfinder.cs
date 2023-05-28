@@ -192,4 +192,9 @@ public class EnemyPathfinder : MonoBehaviour
             m_directions[x][y] = dirBits;
         }
     }
+
+    public BitArray GetDirArray(int x, int y) 
+    {
+        return m_directions[x][y];
+    }
 }

@@ -44,7 +44,7 @@ public class EnemyAI : MonoBehaviour
         Vector2Int pos = new Vector2Int(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.y));
         pos -= gridOffset;
         // Get the direction to the player from the pathfinding system
-        BitArray directions = pathfinder.m_directions[pos.x][pos.y];
+        BitArray directions = pathfinder.GetDirArray(pos.x, pos.y);
         // Turn the array of bools into a Vec2 representing a direction ([0] = Up, [1] = Down, [2] = Left, [3] = Right)
         Vector2 movement = new Vector2Int(0, 0);
         if (directions[0]) { movement.y -= 1; }
@@ -83,17 +83,7 @@ public class EnemyAI : MonoBehaviour
     public void Hurt() 
     {
         health--;
-
-        Debug.Log(gameObject.name + " Health: " + health);
-
-        if (health == 0)
-        {
-            StartCoroutine("Die");
-        }
-        else 
-        {
-            StartCoroutine("TakeDamage");
-        }
+        StartCoroutine(health <= 0 ? "Die" : "TakeDamage");
     }
 
     IEnumerator Die()

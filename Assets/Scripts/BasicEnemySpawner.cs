@@ -5,17 +5,21 @@ using UnityEngine;
 public class BasicEnemySpawner : MonoBehaviour
 {
     public GameObject enemy;
-    // Start is called before the first frame update
-    void Start()
+    public float timeBetweenSpawns = 5.0f;
+    float timeUntilNextSpawn = 0f;
+    MapGeneratorSimple mapGen;
+    Vector3 spawnPosFix = new Vector3(0.5f, 0.5f, 0);
+
+    private void Start()
     {
-        StartCoroutine("SpawnLoop");
+        mapGen = GetComponent<MapGeneratorSimple>();
     }
 
     IEnumerator SpawnLoop() 
     {
         while (true) 
         {
-            Instantiate(enemy, transform.position, Quaternion.identity);
+            
             yield return new WaitForSeconds(5);
         }
     }
@@ -23,6 +27,13 @@ public class BasicEnemySpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        timeUntilNextSpawn -= Time.deltaTime;
+
+        if (timeUntilNextSpawn <= 0) 
+        {
+            Vector3Int spawnPos = (Vector3Int)mapGen.GetRandomValidPos();
+            Instantiate(enemy, spawnPos + spawnPosFix, Quaternion.identity);
+            timeUntilNextSpawn = timeBetweenSpawns;
+        }
     }
 }

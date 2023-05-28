@@ -9,13 +9,15 @@ public class MapGeneratorSimple : MonoBehaviour
     public Tilemap[] levelMaps;
     public RuleTile[] levelRuleTiles;
     Vector2Int offset;
+    List<Vector2Int> validPosList;
 
     // Start is called before the first frame update
     void Awake()
     {
+        HashSet<Vector2Int> inputTilePositions = new HashSet<Vector2Int>();
+
         Vector2Int mapSize = (Vector2Int)debugMap.size;
         offset = (Vector2Int)debugMap.origin;
-
 
         for (int x = 0; x < mapSize.x; x++)
         {
@@ -24,14 +26,49 @@ public class MapGeneratorSimple : MonoBehaviour
                 Vector3Int pos = new Vector3Int(x + offset.x, y + offset.y, 0);
                 if (debugMap.GetSprite(pos) != null)
                 {
-                    for (int i = 0; i < levelMaps.Length; i++)
-                    {
-                        levelMaps[i].SetTile(pos, levelRuleTiles[i]);
-                    }
+                    inputTilePositions.Add((Vector2Int)pos);
                 }
             }
         }
 
+        HashSet<Vector2Int> outputTilePositions = new HashSet<Vector2Int>();
+
+
+
+        foreach (var tilePos in inputTilePositions) 
+        {
+            outputTilePositions.Add(tilePos);
+
+            outputTilePositions.Add(tilePos + Vector2Int.left + Vector2Int.up + Vector2Int.up);
+            outputTilePositions.Add(tilePos + Vector2Int.up + Vector2Int.up);
+            outputTilePositions.Add(tilePos + Vector2Int.right + Vector2Int.up + Vector2Int.up);
+            outputTilePositions.Add(tilePos + Vector2Int.left + Vector2Int.up);
+            outputTilePositions.Add(tilePos + Vector2Int.up);
+            outputTilePositions.Add(tilePos + Vector2Int.right + Vector2Int.up);
+            outputTilePositions.Add(tilePos + Vector2Int.left);
+            outputTilePositions.Add(tilePos + Vector2Int.right);
+            outputTilePositions.Add(tilePos + Vector2Int.left + Vector2Int.down);
+            outputTilePositions.Add(tilePos + Vector2Int.down);
+            outputTilePositions.Add(tilePos + Vector2Int.right + Vector2Int.down);
+        }
+
+
+
+        foreach (var tilePos in outputTilePositions)
+        {
+            for (int i = 0; i < levelMaps.Length; i++)
+            {
+                levelMaps[i].SetTile((Vector3Int)tilePos, levelRuleTiles[i]);
+            }
+        }
+
         debugMap.gameObject.SetActive(false);
+
+        validPosList = new List<Vector2Int>(inputTilePositions);
+    }
+
+    public Vector2Int GetRandomValidPos() 
+    {
+        return validPosList[Random.Range(0, validPosList.Count - 1)];
     }
 }
