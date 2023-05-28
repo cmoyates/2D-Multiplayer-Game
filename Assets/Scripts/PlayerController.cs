@@ -26,6 +26,9 @@ public class PlayerController : MonoBehaviour
     public float dashCooldownScale = 1.0f;
     bool isDashing = false;
 
+    int score = 0;
+    TMP_Text scoreText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -37,6 +40,9 @@ public class PlayerController : MonoBehaviour
 
         healthText = GameObject.Find("Health Text").GetComponent<TMP_Text>();
         healthText.text = "Health: " + health.ToString() + "/" + maxHealth.ToString();
+
+        scoreText = GameObject.Find("Score Text").GetComponent<TMP_Text>();
+        scoreText.text = "Score: " + score.ToString();
     }
 
     // Update is called once per frame
@@ -79,8 +85,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void Hurt()
+    public void Hurt(int damage)
     {
+        if (invincible || damage == 0) return;
         health--;
         healthText.text = "Health: " + health.ToString() + "/" + maxHealth.ToString();
         StartCoroutine(health <= 0 ? "Die" : "TakeDamage");
@@ -135,9 +142,15 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Enemy") && !invincible)
+        if (collision.collider.CompareTag("Enemy"))
         {
-            Hurt();
+            Hurt(collision.gameObject.GetComponent<EnemyAI>().damage);
         }
+    }
+
+    public void GiveScore(int scoreGiven) 
+    {
+        score += scoreGiven;
+        scoreText.text = "Score: " + score.ToString();
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BasicEnemySpawner : MonoBehaviour
 {
-    public GameObject enemy;
+    public GameObject[] enemies;
     public float timeBetweenSpawns = 5.0f;
     float timeUntilNextSpawn = 0f;
     MapGeneratorSimple mapGen;
@@ -15,15 +15,6 @@ public class BasicEnemySpawner : MonoBehaviour
         mapGen = GetComponent<MapGeneratorSimple>();
     }
 
-    IEnumerator SpawnLoop() 
-    {
-        while (true) 
-        {
-            
-            yield return new WaitForSeconds(5);
-        }
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -32,7 +23,7 @@ public class BasicEnemySpawner : MonoBehaviour
         if (timeUntilNextSpawn <= 0) 
         {
             Vector3Int spawnPos = (Vector3Int)mapGen.GetRandomValidPos();
-            Instantiate(enemy, spawnPos + spawnPosFix, Quaternion.identity);
+            Instantiate(enemies[Random.Range(0, enemies.Length)], spawnPos + spawnPosFix, Quaternion.identity);
             timeUntilNextSpawn = timeBetweenSpawns;
         }
     }

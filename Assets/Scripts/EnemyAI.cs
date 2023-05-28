@@ -12,10 +12,12 @@ public class EnemyAI : MonoBehaviour
     SpriteRenderer sr;
     Animator anim;
     public int health = 3;
+    public int damage = 1;
     Material mat;
     Collider2D col;
     public float screenShakeDuration = 0.05f;
     public float screenShakeMagnitude = 0.05f;
+    public int score;
 
     // Start is called before the first frame update
     void Start()
@@ -97,7 +99,7 @@ public class EnemyAI : MonoBehaviour
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
         Time.timeScale = 1;
         //Instantiate(explosionPrefab, transform.position, Quaternion.Euler(90, 0, 0));
-
+        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().GiveScore(score);
         Destroy(gameObject);
         yield return null;
     }
