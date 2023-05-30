@@ -2,14 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameOverUI : MonoBehaviour
 {
     public TMP_Text finalScoreText;
+    public Button playButton;
 
     private void Start()
     {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+
+        playButton.onClick.AddListener(() => {
+            SceneManager.LoadScene(0);
+        });
 
         // Hide on start
         gameObject.SetActive(false);

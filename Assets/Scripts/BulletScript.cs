@@ -5,11 +5,24 @@ using UnityEngine;
 public class BulletScript : MonoBehaviour
 {
     Collider2D col;
+
     // Start is called before the first frame update
     void Start()
     {
+        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+
         col = GetComponent<Collider2D>();
+
         StartCoroutine("Lifetime");
+    }
+
+    private void GameManager_OnStateChanged(object sender, System.EventArgs e)
+    {
+        if (GameManager.Instance.IsGameOver())
+        {
+            GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
+            Destroy(this.gameObject);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -19,18 +32,14 @@ public class BulletScript : MonoBehaviour
             collision.collider.GetComponent<EnemyAI>().Hurt();
         }
 
-
-        //if (!collision.collider.CompareTag("Player"))
-        //{
-        //    
-        //}
-
+        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
         Destroy(this.gameObject);
     }
 
     IEnumerator Lifetime() 
     {
         yield return new WaitForSeconds(5);
+        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
         Destroy(this.gameObject);
     }
 
