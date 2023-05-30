@@ -18,6 +18,8 @@ public class BasicEnemySpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!GameManager.Instance.IsGamePlaying()) return;
+
         timeUntilNextSpawn -= Time.deltaTime;
 
         if (timeUntilNextSpawn <= 0) 

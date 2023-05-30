@@ -40,7 +40,7 @@ public class EnemyAI : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (health <= 0) return;
+        if (health <= 0 || !GameManager.Instance.IsGamePlaying()) return;
 
         // Get the enemy's position in a way that the pathfinding system can understand
         Vector2Int pos = new Vector2Int(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.y));
@@ -99,7 +99,7 @@ public class EnemyAI : MonoBehaviour
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
         Time.timeScale = 1;
         //Instantiate(explosionPrefab, transform.position, Quaternion.Euler(90, 0, 0));
-        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().GiveScore(score);
+        PlayerManager.Instance.AddScore(score);
         Destroy(gameObject);
         yield return null;
     }

@@ -50,8 +50,7 @@ public class PlayerLookAt : MonoBehaviour
 
     public void TriggerShoot(InputAction.CallbackContext context)
     {
-        // When shoot button pressed and it's not an AI controlled game
-        if (context.performed)
+        if (GameManager.Instance.IsGamePlaying() && context.performed)
         {
             // Shoot in that direction
             Shoot(aim);

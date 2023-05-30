@@ -87,6 +87,8 @@ public class EnemyPathfinder : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!GameManager.Instance.IsGamePlaying()) return;
+
         // Run the direction calculations
         DirectionGridCalc();
     }

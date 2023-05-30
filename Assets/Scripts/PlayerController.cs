@@ -1,8 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,12 +9,10 @@ public class PlayerController : MonoBehaviour
     Animator anim;
     Material mat;
 
-    int health = 3;
-    public int maxHealth = 3;
     bool invincible = false;
+
     public float screenShakeDuration = 0.05f;
     public float screenShakeMagnitude = 0.05f;
-    TMP_Text healthText;
 
     public float moveSpeed = 1.0f;
     Vector2 movement = Vector3.zero;
@@ -26,8 +22,6 @@ public class PlayerController : MonoBehaviour
     public float dashCooldownScale = 1.0f;
     bool isDashing = false;
 
-    int score = 0;
-    TMP_Text scoreText;
 
     // Start is called before the first frame update
     void Start()
@@ -37,17 +31,13 @@ public class PlayerController : MonoBehaviour
         anim = GetComponent<Animator>();
 
         mat = sr.material;
-
-        healthText = GameObject.Find("Health Text").GetComponent<TMP_Text>();
-        healthText.text = "Health: " + health.ToString() + "/" + maxHealth.ToString();
-
-        scoreText = GameObject.Find("Score Text").GetComponent<TMP_Text>();
-        scoreText.text = "Score: " + score.ToString();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!GameManager.Instance.IsGamePlaying()) return;
+        
         // If trying to move in the direction the sprite is not facing
         if (movement.x != 0 && (movement.x < 0) != sr.flipX)
         {
@@ -70,6 +60,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!GameManager.Instance.IsGamePlaying()) return;
+
         // Update the animation speed
         anim.SetFloat("Speed", movement.magnitude);
         // Move the player according to the movement vector, the players speed, and whether or not the player was dashing
@@ -88,9 +80,8 @@ public class PlayerController : MonoBehaviour
     public void Hurt(int damage)
     {
         if (invincible || damage == 0) return;
-        health--;
-        healthText.text = "Health: " + health.ToString() + "/" + maxHealth.ToString();
-        StartCoroutine(health <= 0 ? "Die" : "TakeDamage");
+        PlayerManager.Instance.RemoveHealth(damage);
+        StartCoroutine(PlayerManager.Instance.GetHealth() <= 0 ? "Die" : "TakeDamage");
     }
 
     public IEnumerator TakeDamage()
@@ -116,7 +107,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
         Time.timeScale = 1;
         //Instantiate(explosionPrefab, transform.position, Quaternion.Euler(90, 0, 0));
-
+        GameManager.Instance.GameOver();
         Destroy(gameObject);
         yield return null;
     }
@@ -146,11 +137,5 @@ public class PlayerController : MonoBehaviour
         {
             Hurt(collision.gameObject.GetComponent<EnemyAI>().damage);
         }
-    }
-
-    public void GiveScore(int scoreGiven) 
-    {
-        score += scoreGiven;
-        scoreText.text = "Score: " + score.ToString();
     }
 }

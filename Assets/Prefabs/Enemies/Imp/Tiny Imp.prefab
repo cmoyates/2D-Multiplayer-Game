@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96be9ccdda2e5434284519d8c6562bfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 25
+  moveSpeed: 20
   steeringScale: 0.1
   health: 1
   damage: 0
