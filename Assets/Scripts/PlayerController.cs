@@ -1,8 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
+using Cinemachine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     Rigidbody2D rb;
     SpriteRenderer sr;
@@ -22,6 +24,8 @@ public class PlayerController : MonoBehaviour
     public float dashCooldownScale = 1.0f;
     bool isDashing = false;
 
+    Vector2Int gridOffset;
+    NetworkVariable<Vector2Int> gridPos = new NetworkVariable<Vector2Int>(Vector2Int.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     // Start is called before the first frame update
     void Start()
@@ -33,16 +37,45 @@ public class PlayerController : MonoBehaviour
         mat = sr.material;
     }
 
+    public override void OnNetworkSpawn() 
+    {
+        // On the owner
+        if (IsOwner) 
+        {
+            // Get the collider of the spawn area
+            BoxCollider2D spawnAreaCollider = GameObject.FindGameObjectWithTag("SpawnArea").GetComponent<BoxCollider2D>();
+            // Get a random position in that collider
+            Vector3 spawnPos = Vector3.zero;
+            spawnPos.x = spawnAreaCollider.gameObject.transform.position.x + spawnAreaCollider.offset.x + Random.Range(0.5f, spawnAreaCollider.size.x - 0.5f) - spawnAreaCollider.size.x / 2;
+            spawnPos.y = spawnAreaCollider.gameObject.transform.position.y + spawnAreaCollider.offset.y + Random.Range(0.5f, spawnAreaCollider.size.y - 0.5f) - spawnAreaCollider.size.y / 2;
+            // Move the player to that position
+            transform.position = spawnPos;
+
+            // Get the current grid offset
+            gridOffset = EnemyPathfinder.Instance.GetOffset();
+            // Get the initial pos on the grid
+            UpdateGridPos();
+
+            // Enable the player input component
+            GetComponent<PlayerInput>().enabled = true;
+            // Make the camera follow the player
+            var cinemachineVirtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
+            cinemachineVirtualCamera.Follow = gameObject.transform;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (!GameManager.Instance.IsGamePlaying()) return;
+        if (!GameManager.Instance.IsGamePlaying() || !IsOwner) return;
         
         // If trying to move in the direction the sprite is not facing
         if (movement.x != 0 && (movement.x < 0) != sr.flipX)
         {
-            // Flip the sprite
+            // Flip the sprite on the local client
             sr.flipX = !sr.flipX;
+            // Tell the server about it
+            SetSpriteDirServerRpc(sr.flipX, NetworkObjectId);
         }
 
         // Update the dashes cooldown timer and the players color
@@ -50,6 +83,9 @@ public class PlayerController : MonoBehaviour
         {
             dashCooldown -= Time.deltaTime * dashCooldownScale;
         }
+
+        // Update the gridPos
+        UpdateGridPos();
     }
 
     public void Move(InputAction.CallbackContext context)
@@ -60,7 +96,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!GameManager.Instance.IsGamePlaying()) return;
+        if (!GameManager.Instance.IsGamePlaying() || !IsOwner) return;
 
         // Update the animation speed
         anim.SetFloat("Speed", movement.magnitude);
@@ -71,7 +107,7 @@ public class PlayerController : MonoBehaviour
     public void TriggerDash(InputAction.CallbackContext context)
     {
         // If the player presses shift and the dash is not on cooldown, start dashing
-        if (context.performed && dashCooldown <= 0.0f && !isDashing)
+        if (context.performed && dashCooldown <= 0.0f && !isDashing && movement.sqrMagnitude > 0)
         {
             StartCoroutine("Dash");
         }
@@ -92,8 +128,10 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
         mat.SetInt("_Hurt", 0);
         mat.SetFloat("_Opacity", 0.3f);
+        SetShaderOpacityServerRpc(0.3f, NetworkObjectId);
         yield return new WaitForSecondsRealtime(0.5f);
         mat.SetFloat("_Opacity", 1.0f);
+        SetShaderOpacityServerRpc(1.0f, NetworkObjectId);
         invincible = false;
     }
 
@@ -101,8 +139,12 @@ public class PlayerController : MonoBehaviour
     {
         ScreenShake.Instance.Shake(screenShakeDuration * 3, screenShakeMagnitude);
         mat.SetInt("_Hurt", 1);
+
         rb.velocity = Vector2.zero;
-        anim.speed = 0;
+        if (IsOwner) 
+        {
+            anim.speed = 0;
+        }
         Time.timeScale = 0;
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
         Time.timeScale = 1;
@@ -119,6 +161,7 @@ public class PlayerController : MonoBehaviour
         // Make the player invincible and "dashing"
         invincible = true;
         mat.SetFloat("_Opacity", 0.3f);
+        SetShaderOpacityServerRpc(0.3f, NetworkObjectId);
         isDashing = true;
         dashMultiplier = 2;
         dashCooldown = 0.7f;
@@ -129,6 +172,7 @@ public class PlayerController : MonoBehaviour
         dashMultiplier = 1;
         invincible = false;
         mat.SetFloat("_Opacity", 1.0f);
+        SetShaderOpacityServerRpc(1.0f, NetworkObjectId);
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -138,4 +182,82 @@ public class PlayerController : MonoBehaviour
             Hurt(collision.gameObject.GetComponent<EnemyAI>().damage);
         }
     }
+
+    void UpdateGridPos() 
+    {
+        int gridX = Mathf.FloorToInt(transform.position.x) - gridOffset.x;
+        int gridY = Mathf.FloorToInt(transform.position.y) - gridOffset.y;
+        gridPos.Value = new Vector2Int(gridX, gridY);
+    }
+
+    public Vector2Int GetGridPos() 
+    {
+        return gridPos.Value;
+    }
+
+    #region Sprite Dir RPCs
+
+    [ServerRpc]
+    void SetSpriteDirServerRpc(bool flipped, ulong objectId) 
+    {
+        // Tell the all of the clients that a player sprite has changed direction
+        SetSpriteDirClientRpc(flipped, objectId);
+    }
+
+    [ClientRpc]
+    void SetSpriteDirClientRpc(bool flipped, ulong objectId) 
+    {
+        // If the player sprite that changed direction wasn't the local one
+        if (NetworkObjectId == objectId && !IsOwner)
+        {
+            // Update it's direction
+            sr.flipX = flipped;
+        }
+    }
+
+    #endregion
+
+    #region Shader Hurt RPCs
+
+    /*[ServerRpc]
+    void SetShaderHurtServerRpc(int hurt, ulong objectId)
+    {
+        // Tell the all of the clients that a player has been hurt
+        SetShaderHurtClientRpc(hurt, objectId);
+    }
+
+    [ClientRpc]
+    void SetShaderHurtClientRpc(int hurt, ulong objectId)
+    {
+        // If the player that was hurt wasn't the local one
+        if (NetworkObjectId == objectId && !IsOwner)
+        {
+            // Update it's shader
+            mat.SetInt("_Hurt", hurt);
+        }
+    }*/
+
+    #endregion
+
+    #region Shader Hurt RPCs
+
+    [ServerRpc]
+    void SetShaderOpacityServerRpc(float opacity, ulong objectId)
+    {
+        // Tell the all of the clients that a player has been hurt
+        SetShaderOpacityClientRpc(opacity, objectId);
+    }
+
+    [ClientRpc]
+    void SetShaderOpacityClientRpc(float opacity, ulong objectId)
+    {
+        // If the player that was hurt wasn't the local one
+        if (NetworkObjectId == objectId && !IsOwner)
+        {
+            // Update it's shader
+            mat.SetFloat("_Opacity", opacity);
+        }
+    }
+
+    #endregion
 }

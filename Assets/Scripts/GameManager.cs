@@ -20,9 +20,7 @@ public class GameManager : MonoBehaviour
     private State state;
     float waitingToStartTimer = 0.0f;
     float countdownToStartTimer = 3.0f;
-    float gamePlayingTimer = 10.0f;
-
-    int score;
+    float gamePlayingTimer = 300.0f;
 
     private void Awake()
     {
@@ -63,7 +61,6 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-
 
 
     public bool IsGamePlaying() 

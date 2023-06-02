@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Unity.Netcode;
 
-public class EnemyPathfinder : MonoBehaviour
+public class EnemyPathfinder : NetworkBehaviour
 {
     class Node
     {
@@ -30,23 +31,34 @@ public class EnemyPathfinder : MonoBehaviour
         }
     }
 
+    public static EnemyPathfinder Instance { get; private set; }
+
     int[][] m_grid;
     public int[][] m_distance;
     public BitArray[][] m_directions;
     List<Node> m_open;
     int width;
     int height;
-    GameObject player;
+    PlayerController[] playerControllers;
     public Tilemap floor;
     public Vector3Int offset;
-    public Tilemap debugMap;
-    public Tile debugTile;
+
+
+
+
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
 
     // Start is called before the first frame update
     void Start()
     {
-        // Get references to the player (and the players AI if it's a bot), the walls tilemap, and the dungeon generator
-        player = GameObject.FindGameObjectWithTag("Player");
+        NetworkManager.Singleton.OnClientConnectedCallback += UpdatePlayerControllers;
+        NetworkManager.Singleton.OnClientDisconnectCallback += UpdatePlayerControllers;
+
         // Get the offset needed to convert a world position to a grid position, as well as the width and height of the grid
         offset = floor.origin;
         width = floor.size.x;
@@ -57,9 +69,6 @@ public class EnemyPathfinder : MonoBehaviour
         {
             m_open.Add(new Node());
         }
-        // Get the position of the player on the grid
-        int gx = Mathf.FloorToInt(player.transform.position.x) - offset.x;
-        int gy = Mathf.FloorToInt(player.transform.position.y) - offset.y;
 
         // Populate the grid, the distances and the directions with their starting variables
         m_grid = new int[width][];
@@ -74,20 +83,25 @@ public class EnemyPathfinder : MonoBehaviour
             {
                 Vector3Int pos = new Vector3Int(x + offset.x, y + offset.y, 0);
                 m_grid[x][y] = (floor.GetSprite(pos) != null) ? 0 : 1;
-                if (m_grid[x][y] == 0) 
-                {
-                    //debugMap.SetTile(pos, debugTile);
-                }
-                if (x == gx && y == gy) { m_grid[x][y] = 7; }
                 m_distance[x][y] = 0;
                 m_directions[x][y] = new BitArray(4);
             }
         }
     }
 
-    private void FixedUpdate()
+    private void UpdatePlayerControllers(ulong obj)
     {
-        if (!GameManager.Instance.IsGamePlaying()) return;
+        GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
+        playerControllers = new PlayerController[playerObjects.Length];
+        for (int i = 0; i < playerObjects.Length; i++) 
+        {
+            playerControllers[i] = playerObjects[i].GetComponent<PlayerController>();
+        }
+    }
+
+    private void Update()
+    {
+        if (!GameManager.Instance.IsGamePlaying() || playerControllers.Length <= 0) return;
 
         // Run the direction calculations
         DirectionGridCalc();
@@ -105,15 +119,22 @@ public class EnemyPathfinder : MonoBehaviour
             }
         }
 
-        // Get the player's position on the grid
-        int gx = Mathf.FloorToInt(player.transform.position.x) - offset.x;
-        int gy = Mathf.FloorToInt(player.transform.position.y) - offset.y;
 
-        // Starting node added to open
-        m_open[0].SetNode(gx, gy, 0);
-        m_distance[gx][gy] = 0;
-        int openCount = 1;
+
+        for (int i = 0; i < playerControllers.Length; i++)
+        {
+            PlayerController playerController = playerControllers[i];
+            Vector2Int playerGridPos = playerController.GetGridPos();
+
+            // Starting node added to open
+            m_open[i].SetNode(playerGridPos.x, playerGridPos.y, 0);
+            m_distance[playerGridPos.x][playerGridPos.y] = 0;
+        }
+
+
+        int openCount = playerControllers.Length;
         int openIndex = 0;
+
 
         // While open is not empty
         while (openCount - openIndex != 0)
@@ -198,5 +219,10 @@ public class EnemyPathfinder : MonoBehaviour
     public BitArray GetDirArray(int x, int y) 
     {
         return m_directions[x][y];
+    }
+
+    public Vector2Int GetOffset() 
+    {
+        return (Vector2Int)offset;
     }
 }

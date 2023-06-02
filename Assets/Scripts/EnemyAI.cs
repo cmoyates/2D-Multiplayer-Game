@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : NetworkBehaviour
 {
     EnemyPathfinder pathfinder;
     public float moveSpeed;
@@ -32,15 +33,9 @@ public class EnemyAI : MonoBehaviour
         gridOffset = new Vector2Int(pathfinder.floor.origin.x, pathfinder.floor.origin.y);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void FixedUpdate()
     {
-        if (health <= 0 || !GameManager.Instance.IsGamePlaying()) return;
+        if (health <= 0 || !GameManager.Instance.IsGamePlaying() || !IsServer) return;
 
         // Get the enemy's position in a way that the pathfinding system can understand
         Vector2Int pos = new Vector2Int(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.y));
