@@ -80,6 +80,7 @@ public class PlayerController : MonoBehaviour
     public void Hurt(int damage)
     {
         if (invincible || damage == 0) return;
+        SFXManager.Instance.PlayHurtSFX(transform.position);
         PlayerManager.Instance.RemoveHealth(damage);
         StartCoroutine(PlayerManager.Instance.GetHealth() <= 0 ? "Die" : "TakeDamage");
     }

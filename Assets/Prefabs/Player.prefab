@@ -80,6 +80,8 @@ MonoBehaviour:
   isKeyboard: 1
   bulletPrefab: {fileID: 733663524299769148, guid: a096cd73365b3374a963b1610b7ef66c, type: 3}
   bulletForce: 50
+  screenShakeDuration: 0.05
+  screenShakeMagnitude: 0.25
 --- !u!1 &7574169059386688059
 GameObject:
   m_ObjectHideFlags: 0
@@ -266,6 +268,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29f5d449a6d2e4943878190b7c93904f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  screenShakeDuration: 0.05
+  screenShakeMagnitude: 1
   moveSpeed: 5
   dashMultiplier: 1
   dashCooldownScale: 1

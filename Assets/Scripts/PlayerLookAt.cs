@@ -9,6 +9,8 @@ public class PlayerLookAt : MonoBehaviour
     public bool isKeyboard = true;
     public GameObject bulletPrefab;
     public float bulletForce = 1.0f;
+    public float screenShakeDuration = 1.0f;
+    public float screenShakeMagnitude = 1.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +47,16 @@ public class PlayerLookAt : MonoBehaviour
     {
         // Check if the player is using a keyboard
         isKeyboard = playerInput.currentControlScheme.Equals("Keyboard");
+        if (isKeyboard)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else 
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
         Debug.Log("Now playing using: " + playerInput.currentControlScheme);
     }
 
@@ -60,8 +72,9 @@ public class PlayerLookAt : MonoBehaviour
     public void Shoot(Vector2 lookDir)
     {
         // Play the shooting sound and shake the screen
-        //audioSource.PlayOneShot(audioSource.clip);
+        SFXManager.Instance.PlayShootSFX(transform.position);
         //StartCoroutine(ss.Shake(shakeDuration, shakeMagnitude));
+        ScreenShake.Instance.Shake(screenShakeDuration, screenShakeMagnitude);
 
         // Spawn the bullet
         lookDir *= 0.5f;

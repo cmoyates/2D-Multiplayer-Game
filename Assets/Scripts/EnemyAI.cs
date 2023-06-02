@@ -85,6 +85,7 @@ public class EnemyAI : MonoBehaviour
     public void Hurt() 
     {
         health--;
+        SFXManager.Instance.PlayHurtSFX(transform.position);
         StartCoroutine(health <= 0 ? "Die" : "TakeDamage");
     }
 
