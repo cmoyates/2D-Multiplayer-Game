@@ -26,6 +26,7 @@ public class BasicEnemySpawner : MonoBehaviour
         {
             Vector3Int spawnPos = (Vector3Int)mapGen.GetRandomValidPos();
             Instantiate(enemies[Random.Range(0, enemies.Length)], spawnPos + spawnPosFix, Quaternion.identity);
+            timeBetweenSpawns *= 0.99f;
             timeUntilNextSpawn = timeBetweenSpawns;
         }
     }

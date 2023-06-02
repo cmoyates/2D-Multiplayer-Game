@@ -8,14 +8,19 @@ using UnityEngine.SceneManagement;
 public class GameOverUI : MonoBehaviour
 {
     public TMP_Text finalScoreText;
-    public Button playButton;
+    public Button menuButton;
+    public Button playAgainButton;
 
     private void Start()
     {
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
 
-        playButton.onClick.AddListener(() => {
+        menuButton.onClick.AddListener(() => {
             SceneManager.LoadScene(0);
+        });
+
+        playAgainButton.onClick.AddListener(() => {
+            SceneManager.LoadScene(1);
         });
 
         // Hide on start
