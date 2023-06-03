@@ -9,10 +9,13 @@ public class BasicEnemySpawner : MonoBehaviour
     float timeUntilNextSpawn = 0f;
     MapGeneratorSimple mapGen;
     Vector3 spawnPosFix = new Vector3(0.5f, 0.5f, 0);
+    Transform playerTransform;
+    public float playerSafeRadius = 3.0f;
 
     private void Start()
     {
         mapGen = GetComponent<MapGeneratorSimple>();
+        playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     // Update is called once per frame
@@ -24,8 +27,16 @@ public class BasicEnemySpawner : MonoBehaviour
 
         if (timeUntilNextSpawn <= 0) 
         {
-            Vector3Int spawnPos = (Vector3Int)mapGen.GetRandomValidPos();
-            Instantiate(enemies[Random.Range(0, enemies.Length)], spawnPos + spawnPosFix, Quaternion.identity);
+            bool validSpawnPosFound = false;
+            Vector3 spawnPos = Vector3.zero;
+
+            while (!validSpawnPosFound) 
+            {
+                spawnPos = (Vector3Int)mapGen.GetRandomValidPos() + spawnPosFix;
+                validSpawnPosFound = Vector3.Distance(playerTransform.position, spawnPos) >= playerSafeRadius;
+            }
+
+            Instantiate(enemies[Random.Range(0, enemies.Length)], spawnPos, Quaternion.identity);
             timeBetweenSpawns *= 0.99f;
             timeUntilNextSpawn = timeBetweenSpawns;
         }
