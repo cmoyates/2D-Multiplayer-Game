@@ -1,0 +1,10 @@
+charging sound effect
+round change sound
+red corners when player damaged
+heart sprites instead of numbers
+pixelated font
+chest / mimic
+coins
+
+Enemies
+- Charger that speeds up after every charge

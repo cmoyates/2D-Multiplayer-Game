@@ -29,7 +29,7 @@ public class BulletScript : MonoBehaviour
     {
         if (collision.collider.CompareTag("Enemy"))
         {
-            collision.collider.GetComponent<EnemyAI>().Hurt();
+            collision.collider.GetComponent<AIBase>().Hurt();
         }
 
         GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;

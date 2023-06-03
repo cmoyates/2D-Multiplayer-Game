@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public event EventHandler OnStateChanged;
+    public event EventHandler OnRoundChanged;
 
     private enum State 
     {
@@ -21,7 +22,8 @@ public class GameManager : MonoBehaviour
     float waitingToStartTimer = 0.0f;
     float countdownToStartTimer = 3.0f;
 
-    int score;
+    [SerializeField]
+    int round = 1;
 
     private void Awake()
     {
@@ -84,5 +86,16 @@ public class GameManager : MonoBehaviour
     public float GetCountdownToStartTimer() 
     {
         return countdownToStartTimer;
+    }
+
+    public int GetRound() 
+    {
+        return round;
+    }
+
+    public void NextRound() 
+    {
+        round++;
+        OnRoundChanged?.Invoke(this, EventArgs.Empty);
     }
 }

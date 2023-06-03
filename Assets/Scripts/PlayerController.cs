@@ -136,7 +136,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.collider.CompareTag("Enemy"))
         {
-            Hurt(collision.gameObject.GetComponent<EnemyAI>().damage);
+            Hurt(collision.gameObject.GetComponent<AIBase>().damage);
         }
     }
 }

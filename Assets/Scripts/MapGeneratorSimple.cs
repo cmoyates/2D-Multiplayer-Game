@@ -10,6 +10,7 @@ public class MapGeneratorSimple : MonoBehaviour
     public RuleTile[] levelRuleTiles;
     Vector2Int offset;
     List<Vector2Int> validPosList;
+    public bool justPathfinding = false;
 
     // Start is called before the first frame update
     void Awake()
@@ -54,11 +55,14 @@ public class MapGeneratorSimple : MonoBehaviour
 
 
 
-        foreach (var tilePos in outputTilePositions)
+        if (!justPathfinding) 
         {
-            for (int i = 0; i < levelMaps.Length; i++)
+            foreach (var tilePos in outputTilePositions)
             {
-                levelMaps[i].SetTile((Vector3Int)tilePos, levelRuleTiles[i]);
+                for (int i = 0; i < levelMaps.Length; i++)
+                {
+                    levelMaps[i].SetTile((Vector3Int)tilePos, levelRuleTiles[i]);
+                }
             }
         }
 
