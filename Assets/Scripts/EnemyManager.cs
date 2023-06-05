@@ -40,7 +40,7 @@ public class EnemyManager : MonoBehaviour
 
     private void Start()
     {
-        GameManager.Instance.OnRoundChanged += GameManager_OnRoundChanged;
+        //GameManager.Instance.OnRoundChanged += GameManager_OnRoundChanged;
 
         currentRoundSpawnTotal = roundSpawnCounts[0];
 
@@ -50,7 +50,7 @@ public class EnemyManager : MonoBehaviour
 
     private void GameManager_OnRoundChanged(object sender, System.EventArgs e)
     {
-        currentRoundSpawnTotal = roundSpawnCounts[GameManager.Instance.GetRound() - 1];
+        //currentRoundSpawnTotal = roundSpawnCounts[GameManager.Instance.GetRound() - 1];
         currentRoundSpawnCount = 0;
         currentRoundEnemiesKilled = 0;
         EnemiesRemainingChanged.Invoke(this, EventArgs.Empty);
@@ -74,7 +74,7 @@ public class EnemyManager : MonoBehaviour
                 validSpawnPosFound = Vector3.Distance(playerTransform.position, spawnPos) >= playerSafeRadius;
             }
 
-            Instantiate(roundSpawnDistributions[GameManager.Instance.GetRound() - 1].distribution[UnityEngine.Random.Range(0, roundSpawnDistributions[GameManager.Instance.GetRound()-1].distribution.Length)], spawnPos, Quaternion.identity);
+            //Instantiate(roundSpawnDistributions[GameManager.Instance.GetRound() - 1].distribution[UnityEngine.Random.Range(0, roundSpawnDistributions[GameManager.Instance.GetRound()-1].distribution.Length)], spawnPos, Quaternion.identity);
             //timeBetweenSpawns *= 0.99f;
             timeUntilNextSpawn = timeBetweenSpawns;
             currentRoundSpawnCount++;
@@ -87,7 +87,7 @@ public class EnemyManager : MonoBehaviour
         EnemiesRemainingChanged.Invoke(this, EventArgs.Empty);
         if (currentRoundEnemiesKilled >= currentRoundSpawnTotal) 
         {
-            GameManager.Instance.NextRound();
+            //GameManager.Instance.NextRound();
         }
     }
 

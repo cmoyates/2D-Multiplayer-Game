@@ -13,16 +13,32 @@ public class PlayerManager : MonoBehaviour
     public int maxHealth = 3;
     int health = 0;
     int score = 0;
+    GameObject player;
+    Rigidbody2D playerRB;
 
     private void Awake()
     {
         Instance = this;
-        
+
         health = maxHealth;
         score = 0;
     }
 
+    private void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player");
+        playerRB = player.GetComponent<Rigidbody2D>();
 
+        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+    }
+
+    private void GameManager_OnStateChanged(object sender, EventArgs e)
+    {
+        if (GameManager.Instance.IsGamePlaying()) 
+        {
+            playerRB.simulated = true;
+        }
+    }
 
     public int GetScore()
     {
@@ -69,5 +85,11 @@ public class PlayerManager : MonoBehaviour
     {
         health -= removedHealth;
         OnHealthChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void SpawnPlayerAtPos(Vector3 pos) 
+    {
+        playerRB.simulated = false;
+        player.transform.position = pos;
     }
 }

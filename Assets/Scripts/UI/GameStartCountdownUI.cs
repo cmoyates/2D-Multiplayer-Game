@@ -8,6 +8,7 @@ public class GameStartCountdownUI : MonoBehaviour
 {
     public TMP_Text countdownText;
     public Image bgColorImage;
+    bool waitingToStart = true;
 
     private void Start()
     {
@@ -15,14 +16,18 @@ public class GameStartCountdownUI : MonoBehaviour
 
         // Hide on start
         gameObject.SetActive(false);
+
+        GameManager_OnStateChanged(null, null);
     }
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e)
     {
-        if (GameManager.Instance.IsCountdownToStartActive())
+        waitingToStart = GameManager.Instance.IsWaitingToStart();
+        if (GameManager.Instance.IsCountdownToStartActive() || waitingToStart)
         {
             // Show
             gameObject.SetActive(true);
+            countdownText.text = waitingToStart ? "Loading..." : "3";
         }
         else 
         {
@@ -33,6 +38,7 @@ public class GameStartCountdownUI : MonoBehaviour
 
     private void Update()
     {
+        if (waitingToStart) return;
         float countdownTimer = GameManager.Instance.GetCountdownToStartTimer();
         Color bgColor = bgColorImage.color;
         bgColor.a = countdownTimer / 3.0f;

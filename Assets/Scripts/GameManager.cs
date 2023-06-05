@@ -8,7 +8,6 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public event EventHandler OnStateChanged;
-    public event EventHandler OnRoundChanged;
 
     private enum State 
     {
@@ -19,11 +18,8 @@ public class GameManager : MonoBehaviour
     }
 
     private State state;
-    float waitingToStartTimer = 0.0f;
     float countdownToStartTimer = 3.0f;
 
-    [SerializeField]
-    int round = 1;
 
     private void Awake()
     {
@@ -36,12 +32,6 @@ public class GameManager : MonoBehaviour
         switch (state)
         {
             case State.WaitingToStart:
-                waitingToStartTimer -= Time.deltaTime;
-                if (waitingToStartTimer < 0f) 
-                {
-                    state = State.CountdownToStart;
-                    OnStateChanged?.Invoke(this, EventArgs.Empty);
-                }
                 break;
             case State.CountdownToStart:
                 countdownToStartTimer -= Time.deltaTime;
@@ -77,6 +67,11 @@ public class GameManager : MonoBehaviour
         return state == State.CountdownToStart;
     }
 
+    public bool IsWaitingToStart() 
+    {
+        return state == State.WaitingToStart;
+    }
+
     public void GameOver() 
     {
         state = State.GameOver;
@@ -88,14 +83,9 @@ public class GameManager : MonoBehaviour
         return countdownToStartTimer;
     }
 
-    public int GetRound() 
+    public void StartCountdown() 
     {
-        return round;
-    }
-
-    public void NextRound() 
-    {
-        round++;
-        OnRoundChanged?.Invoke(this, EventArgs.Empty);
+        state = State.CountdownToStart;
+        OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 }
