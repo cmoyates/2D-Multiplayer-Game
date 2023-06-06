@@ -74,7 +74,7 @@ public class PlayerLookAt : MonoBehaviour
         // Play the shooting sound and shake the screen
         SFXManager.Instance.PlayShootSFX(transform.position);
         //StartCoroutine(ss.Shake(shakeDuration, shakeMagnitude));
-        ScreenShake.Instance.Shake(screenShakeDuration, screenShakeMagnitude);
+        CameraManager.Instance.ShakeScreen(screenShakeDuration, screenShakeMagnitude);
 
         // Spawn the bullet
         lookDir *= 0.5f;

@@ -5,6 +5,8 @@ using UnityEngine.Tilemaps;
 
 public class EnemyPathfinder : MonoBehaviour
 {
+    public static EnemyPathfinder Instance { get; private set; }
+
     class Node
     {
         // Info about the node
@@ -37,34 +39,49 @@ public class EnemyPathfinder : MonoBehaviour
     int width;
     int height;
     GameObject player;
-    public Tilemap floor;
-    public Vector3Int offset;
+    public Tilemap walls;
+    public Vector2Int offset;
+    bool active = false;
     public Tilemap debugMap;
     public Tile debugTile;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void Start()
     {
         // Get references to the player (and the players AI if it's a bot), the walls tilemap, and the dungeon generator
         player = GameObject.FindGameObjectWithTag("Player");
+    }
+
+    public void Initialize(Vector2Int origin, Vector2Int size)
+    {
         // Get the offset needed to convert a world position to a grid position, as well as the width and height of the grid
-        offset = floor.origin;
-        width = floor.size.x;
-        height = floor.size.y;
+        offset = origin;
+        width = size.x;
+        height = size.y;
+
+        Debug.Log(walls.origin);
+        Debug.Log(walls.size);
+
         // Create the "open list" and populate it with nodes
         m_open = new List<Node>();
         for (int i = 0; i < width * height; i++)
         {
             m_open.Add(new Node());
         }
-        // Get the position of the player on the grid
-        int gx = Mathf.FloorToInt(player.transform.position.x) - offset.x;
-        int gy = Mathf.FloorToInt(player.transform.position.y) - offset.y;
 
         // Populate the grid, the distances and the directions with their starting variables
         m_grid = new int[width][];
         m_distance = new int[width][];
         m_directions = new BitArray[width][];
+
+        // Get the position of the player on the grid
+        int gx = Mathf.FloorToInt(player.transform.position.x) - offset.x;
+        int gy = Mathf.FloorToInt(player.transform.position.y) - offset.y;
+
         for (int x = 0; x < width; x++)
         {
             m_grid[x] = new int[height];
@@ -73,21 +90,23 @@ public class EnemyPathfinder : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
                 Vector3Int pos = new Vector3Int(x + offset.x, y + offset.y, 0);
-                m_grid[x][y] = (floor.GetSprite(pos) != null) ? 0 : 1;
-                if (m_grid[x][y] == 0) 
+                m_grid[x][y] = (walls.GetSprite(pos) == null && walls.GetTile(pos) != null) ? 0 : 1;
+                if (m_grid[x][y] == 0)
                 {
-                    //debugMap.SetTile(pos, debugTile);
+                    debugMap.SetTile(pos, debugTile);
                 }
                 if (x == gx && y == gy) { m_grid[x][y] = 7; }
                 m_distance[x][y] = 0;
                 m_directions[x][y] = new BitArray(4);
             }
         }
+
+        active = true;
     }
 
     private void FixedUpdate()
     {
-        if (!GameManager.Instance.IsGamePlaying()) return;
+        if (!GameManager.Instance.IsGamePlaying() || !active) return;
 
         // Run the direction calculations
         DirectionGridCalc();
@@ -198,5 +217,15 @@ public class EnemyPathfinder : MonoBehaviour
     public BitArray GetDirArray(int x, int y) 
     {
         return m_directions[x][y];
+    }
+
+    public void DeactivatePathfinding() 
+    {
+        active = false;
+    }
+
+    public Vector2Int GetOffset() 
+    {
+        return offset;
     }
 }

@@ -29,7 +29,7 @@ public class EnemyAI : MonoBehaviour
         col = GetComponent<Collider2D>();
         mat = sr.material;
 
-        gridOffset = new Vector2Int(pathfinder.floor.origin.x, pathfinder.floor.origin.y);
+        gridOffset = new Vector2Int(pathfinder.walls.origin.x, pathfinder.walls.origin.y);
     }
 
     // Update is called once per frame
@@ -74,7 +74,7 @@ public class EnemyAI : MonoBehaviour
 
     public IEnumerator TakeDamage() 
     {
-        ScreenShake.Instance.Shake(screenShakeDuration, screenShakeMagnitude);
+        CameraManager.Instance.ShakeScreen(screenShakeDuration, screenShakeMagnitude);
         mat.SetInt("_Hurt", 1);
         Time.timeScale = 0;
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
@@ -91,7 +91,7 @@ public class EnemyAI : MonoBehaviour
 
     IEnumerator Die()
     {
-        ScreenShake.Instance.Shake(screenShakeDuration * 3, screenShakeMagnitude);
+        CameraManager.Instance.ShakeScreen(screenShakeDuration * 3, screenShakeMagnitude);
         mat.SetInt("_Hurt", 1);
         rb.velocity = Vector2.zero;
         anim.speed = 0;
@@ -101,6 +101,7 @@ public class EnemyAI : MonoBehaviour
         Time.timeScale = 1;
         //Instantiate(explosionPrefab, transform.position, Quaternion.Euler(90, 0, 0));
         PlayerManager.Instance.AddScore(score);
+        CameraManager.Instance.RemoveFromTargetGroup(transform);
         Destroy(gameObject);
         yield return null;
     }

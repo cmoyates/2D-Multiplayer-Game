@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-public class ScreenShake : MonoBehaviour
+public class CameraManager : MonoBehaviour
 {
-    public static ScreenShake Instance { get; private set; }
+    public static CameraManager Instance { get; private set; }
     float shakeTimer = 0;
     CinemachineBasicMultiChannelPerlin cinemachineBasicMultiChannelPerlin;
+    [SerializeField]
+    CinemachineTargetGroup targetGroup;
 
     private void Awake()
     {
@@ -16,7 +18,7 @@ public class ScreenShake : MonoBehaviour
     }
 
     // The coroutine that shakes the camera
-    public void Shake(float duration, float magnitude)
+    public void ShakeScreen(float duration, float magnitude)
     {
         cinemachineBasicMultiChannelPerlin.m_AmplitudeGain = magnitude;
         shakeTimer = duration;
@@ -32,5 +34,15 @@ public class ScreenShake : MonoBehaviour
                 cinemachineBasicMultiChannelPerlin.m_AmplitudeGain = 0;
             }
         }
+    }
+
+    public void AddToTargetGroup(Transform objectTransform) 
+    {
+        targetGroup.AddMember(objectTransform, 1.0f, 1.0f);
+    }
+
+    public void RemoveFromTargetGroup(Transform objectTransform) 
+    {
+        targetGroup.RemoveMember(objectTransform);
     }
 }

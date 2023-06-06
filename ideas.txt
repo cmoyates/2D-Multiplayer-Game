@@ -1,10 +1,17 @@
-charging sound effect
-round change sound
+
+!!! NORMALIZE ROOM TRIGGERS !!!
+
 red corners when player damaged
-heart sprites instead of numbers
-pixelated font
 chest / mimic
 coins
 
 Enemies
 - Charger that speeds up after every charge
+
+Make compass point to next room in path instead of just end room
+End room teleports to boss room (black fade)
+Boss: Red Orc
+- Large
+- Only damage when stunned
+- - Need visual indication of that
+- Smart orc behaviour

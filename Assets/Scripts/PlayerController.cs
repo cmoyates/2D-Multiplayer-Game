@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
     public void TriggerDash(InputAction.CallbackContext context)
     {
         // If the player presses shift and the dash is not on cooldown, start dashing
-        if (context.performed && dashCooldown <= 0.0f && !isDashing)
+        if (GameManager.Instance.IsGamePlaying() && context.performed && dashCooldown <= 0.0f && !isDashing)
         {
             StartCoroutine("Dash");
         }
@@ -88,19 +88,19 @@ public class PlayerController : MonoBehaviour
     public IEnumerator TakeDamage()
     {
         invincible = true;
-        ScreenShake.Instance.Shake(screenShakeDuration, screenShakeMagnitude);
+        CameraManager.Instance.ShakeScreen(screenShakeDuration, screenShakeMagnitude);
         mat.SetInt("_Hurt", 1);
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
         mat.SetInt("_Hurt", 0);
         mat.SetFloat("_Opacity", 0.3f);
-        yield return new WaitForSecondsRealtime(0.5f);
+        yield return new WaitForSecondsRealtime(1.0f);
         mat.SetFloat("_Opacity", 1.0f);
         invincible = false;
     }
 
     IEnumerator Die()
     {
-        ScreenShake.Instance.Shake(screenShakeDuration * 3, screenShakeMagnitude);
+        CameraManager.Instance.ShakeScreen(screenShakeDuration * 3, screenShakeMagnitude);
         mat.SetInt("_Hurt", 1);
         rb.velocity = Vector2.zero;
         anim.speed = 0;
@@ -116,7 +116,8 @@ public class PlayerController : MonoBehaviour
     public IEnumerator Dash()
     {
         // Shake the screen
-        ScreenShake.Instance.Shake(0.1f, 0.1f);
+        CameraManager.Instance.ShakeScreen(0.1f, 0.1f);
+        SFXManager.Instance.PlayDashSFX(transform.position);
         // Make the player invincible and "dashing"
         invincible = true;
         mat.SetFloat("_Opacity", 0.3f);

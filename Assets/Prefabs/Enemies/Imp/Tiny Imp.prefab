@@ -185,7 +185,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 8.5
   steeringScale: 0.11
-  health: 1
+  maxHealth: 1
   damage: 0
   screenShakeDuration: 0.05
   screenShakeMagnitude: 2

@@ -120,12 +120,24 @@ public class LevelGenerator : MonoBehaviour
         GetMinSpanningTree();
         GetStartAndEnd();
         GetHallwayLines();
-        GetOtherRooms();
+        //GetOtherRooms();
+        foreach (var roomRect in otherRoomRects)
+        {
+            roomRect.SetActive(false);
+        }
         PlaceRoomTiles();
         PlaceHallwayTiles();
         PopulateTilemap();
 
-        PlayerManager.Instance.SpawnPlayerAtPos(mainRoomRects[startAndEndIndices[0]].transform.position);
+        debugTilemap.ClearAllTiles();
+
+        GameObject startRoom = mainRoomRects[startAndEndIndices[0]];
+        LevelManager.Instance.endRoom = mainRoomRects[startAndEndIndices[1]];
+        LevelManager.Instance.endRoom.GetComponent<RoomScript>().isEndRoom = true;
+        // Might need to change this later
+        Destroy(startRoom.GetComponent<RoomScript>());
+        Destroy(startRoom.GetComponent<BoxCollider2D>());
+        PlayerManager.Instance.SpawnPlayerAtPos(startRoom.transform.position);
         GameManager.Instance.StartCountdown();
     }
 
@@ -287,7 +299,9 @@ public class LevelGenerator : MonoBehaviour
 
             // Cleanup the roomRect object
             Destroy(roomRect.GetComponent<LevelGenRect>());
+            roomRect.AddComponent<RoomScript>();
             rectCol.isTrigger = true;
+            rectCol.size -= Vector2.one * 2;
         }
     }
 

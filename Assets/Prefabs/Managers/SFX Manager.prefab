@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2114096245449823358
 MonoBehaviour:
@@ -48,6 +48,7 @@ MonoBehaviour:
   sfxMixer: {fileID: 4035684388744128794, guid: 1811f929c59f6df4bae1f3e9cb265cd3, type: 2}
   shootClip: {fileID: 8300000, guid: 8738def55627190428e59da392cc97f9, type: 3}
   hurtClip: {fileID: 8300000, guid: a8fdbc704a3749545bb543010332c096, type: 3}
+  dashClip: {fileID: 8300000, guid: 8cd621070610b4c44afe5072631530fb, type: 3}
 --- !u!82 &8715489744782232836
 AudioSource:
   m_ObjectHideFlags: 0

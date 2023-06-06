@@ -10,6 +10,7 @@ public class SFXManager : MonoBehaviour
     public AudioMixerGroup sfxMixer;
     public AudioClip shootClip;
     public AudioClip hurtClip;
+    public AudioClip dashClip;
 
     private void Awake()
     {
@@ -39,5 +40,10 @@ public class SFXManager : MonoBehaviour
     public void PlayHurtSFX(Vector3 pos) 
     {
         PlayClipAtPoint(hurtClip, pos, 1, sfxMixer);
+    }
+
+    public void PlayDashSFX(Vector3 pos, float volume = 2.0f) 
+    {
+        PlayClipAtPoint(dashClip, pos, volume, sfxMixer);
     }
 }

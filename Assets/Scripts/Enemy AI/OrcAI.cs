@@ -52,6 +52,7 @@ public class OrcAI : AIBase
                 var hit = Physics2D.CircleCast(transform.position, 1.0f, (playerTransform.position - transform.position), Mathf.Infinity, lineOfSightLayerMask);
                 if (hit.collider.CompareTag("Player") && (dumb || Vector2.Distance(transform.position, playerTransform.position) <= playerDistThreshold)) 
                 {
+                    SFXManager.Instance.PlayDashSFX(transform.position);
                     playerDir = (playerTransform.position - transform.position).normalized;
                     state = State.Charging;
                 }

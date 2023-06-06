@@ -164,12 +164,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   steeringScale: 0.2
-  health: 3
+  maxHealth: 3
   damage: 1
   screenShakeDuration: 0.05
   screenShakeMagnitude: 0.05
   score: 0
-  state: 0
+  state: 2
   lineOfSightLayerMask:
     serializedVersion: 2
     m_Bits: 1

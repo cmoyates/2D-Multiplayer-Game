@@ -11,7 +11,8 @@ public abstract class AIBase : MonoBehaviour
     protected Vector2Int gridOffset;
     SpriteRenderer sr;
     Animator anim;
-    public int health = 3;
+    public int maxHealth = 3;
+    protected int health = 3;
     public int damage = 1;
     Material mat;
     Collider2D col;
@@ -30,7 +31,9 @@ public abstract class AIBase : MonoBehaviour
         col = GetComponent<Collider2D>();
         mat = sr.material;
 
-        gridOffset = (Vector2Int)pathfinder.floor.origin;
+        gridOffset = pathfinder.GetOffset();
+
+        health = maxHealth;
     }
 
     protected void FixedUpdate() 
@@ -48,7 +51,7 @@ public abstract class AIBase : MonoBehaviour
 
     public IEnumerator TakeDamage()
     {
-        ScreenShake.Instance.Shake(screenShakeDuration, screenShakeMagnitude);
+        CameraManager.Instance.ShakeScreen(screenShakeDuration, screenShakeMagnitude);
         mat.SetInt("_Hurt", 1);
         Time.timeScale = 0;
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
@@ -65,7 +68,7 @@ public abstract class AIBase : MonoBehaviour
 
     IEnumerator Die()
     {
-        ScreenShake.Instance.Shake(screenShakeDuration * 3, screenShakeMagnitude);
+        CameraManager.Instance.ShakeScreen(screenShakeDuration * 3, screenShakeMagnitude);
         mat.SetInt("_Hurt", 1);
         rb.velocity = Vector2.zero;
         anim.speed = 0;
@@ -76,6 +79,7 @@ public abstract class AIBase : MonoBehaviour
         //Instantiate(explosionPrefab, transform.position, Quaternion.Euler(90, 0, 0));
         PlayerManager.Instance.AddScore(score);
         EnemyManager.Instance.EnemyKilled();
+        CameraManager.Instance.RemoveFromTargetGroup(transform);
         Destroy(gameObject);
         yield return null;
     }
