@@ -9,8 +9,10 @@ public class PlayerManager : MonoBehaviour
 
     public event EventHandler OnHealthChanged;
     public event EventHandler OnScoreChanged;
+    public event EventHandler OnUpgradeAdded;
 
     public int maxHealth = 3;
+    [SerializeField]
     int health = 0;
     int score = 0;
     GameObject player;
@@ -36,6 +38,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (GameManager.Instance.IsGamePlaying()) 
         {
+            playerRB.velocity = Vector2.zero;
             playerRB.simulated = true;
         }
     }
@@ -69,6 +72,8 @@ public class PlayerManager : MonoBehaviour
         return maxHealth;
     }
 
+    #region Health
+
     public void SetHealth(int newHealth)
     {
         health = newHealth;
@@ -87,9 +92,17 @@ public class PlayerManager : MonoBehaviour
         OnHealthChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    #endregion
+
     public void SpawnPlayerAtPos(Vector3 pos) 
     {
         playerRB.simulated = false;
         player.transform.position = pos;
+    }
+
+    public void AddUpgrade(UpgradePickupSO newUpgrade) 
+    {
+        Debug.Log("Upgrade Collected: " + newUpgrade.name);
+        OnUpgradeAdded.Invoke(newUpgrade, EventArgs.Empty);
     }
 }

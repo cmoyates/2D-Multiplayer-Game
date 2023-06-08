@@ -1,12 +1,17 @@
 
 !!! NORMALIZE ROOM TRIGGERS !!!
 
+Compass bug
+Map
+Pause Menu
+
 red corners when player damaged
 chest / mimic
 coins
 
 Enemies
 - Charger that speeds up after every charge
+- Stationary turret enemy
 
 Make compass point to next room in path instead of just end room
 End room teleports to boss room (black fade)
@@ -15,3 +20,4 @@ Boss: Red Orc
 - Only damage when stunned
 - - Need visual indication of that
 - Smart orc behaviour
+

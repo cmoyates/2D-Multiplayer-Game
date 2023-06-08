@@ -5,16 +5,32 @@ using UnityEngine.InputSystem;
 
 public class PlayerLookAt : MonoBehaviour
 {
+    [SerializeField]
     Vector2 aim;
     public bool isKeyboard = true;
     public GameObject bulletPrefab;
     public float bulletForce = 1.0f;
     public float screenShakeDuration = 1.0f;
     public float screenShakeMagnitude = 1.0f;
+    PlayerController playerController;
+    [SerializeField]
+    Rigidbody2D playerRB;
+    [SerializeField]
+    float recoilMultiplier = 5.0f;
+    SpriteRenderer playerSR;
+    Animator playerAnim;
+    bool playerAnimForward = true;
+    [SerializeField]
+    float kickbackMul =  1.0f;
 
     // Start is called before the first frame update
     void Start()
     {
+        playerController = GetComponentInParent<PlayerController>();
+        playerRB = GetComponentInParent<Rigidbody2D>();
+        playerSR = GetComponentInParent<SpriteRenderer>();
+        playerAnim = GetComponentInParent<Animator>();
+
         // The player starts the game aiming down
         aim = Vector2.down;
     }
@@ -24,6 +40,19 @@ public class PlayerLookAt : MonoBehaviour
     {
         // Make the weapon look in the direction
         transform.right = aim;
+
+        // If trying to aim in the direction the sprite is not facing
+        if (aim.x != 0 && (aim.x < 0) != playerSR.flipX)
+        {
+            // Flip the sprite
+            playerSR.flipX = !playerSR.flipX;
+            
+        }
+        if (aim.x != 0 && (aim.x > 0 == playerController.GetMovement().x > 0) != playerAnimForward) 
+        {
+            playerAnimForward = !playerAnimForward;
+            playerAnim.SetBool("Forward", playerAnimForward);
+        }
     }
 
     public void SetAim(InputAction.CallbackContext context)
@@ -62,7 +91,7 @@ public class PlayerLookAt : MonoBehaviour
 
     public void TriggerShoot(InputAction.CallbackContext context)
     {
-        if (GameManager.Instance.IsGamePlaying() && context.performed)
+        if (GameManager.Instance.IsGamePlaying() && !playerController.IsDashing() && context.performed)
         {
             // Shoot in that direction
             Shoot(aim);
@@ -78,9 +107,12 @@ public class PlayerLookAt : MonoBehaviour
 
         // Spawn the bullet
         lookDir *= 0.5f;
-        GameObject bullet = Instantiate(bulletPrefab, new Vector3(lookDir.x + transform.position.x, lookDir.y + transform.position.y, 0), Quaternion.identity);
+        Vector3 spawnPos = new Vector3(lookDir.x + transform.position.x, lookDir.y + transform.position.y, 0);
+        GameObject bullet = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
         // Add the appropriate force to the bullet
         Rigidbody2D bulletRB = bullet.GetComponent<Rigidbody2D>();
         bulletRB.AddForce(lookDir * bulletForce, ForceMode2D.Impulse);
+        playerRB.AddForce(-lookDir * recoilMultiplier, ForceMode2D.Impulse);
+        CameraManager.Instance.Kickback(lookDir * kickbackMul);
     }
 }

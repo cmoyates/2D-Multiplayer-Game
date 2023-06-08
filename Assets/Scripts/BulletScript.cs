@@ -12,8 +12,6 @@ public class BulletScript : MonoBehaviour
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
 
         col = GetComponent<Collider2D>();
-
-        StartCoroutine("Lifetime");
     }
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e)
@@ -36,12 +34,11 @@ public class BulletScript : MonoBehaviour
         Destroy(this.gameObject);
     }
 
-    IEnumerator Lifetime() 
+    private void OnDestroy()
     {
-        yield return new WaitForSeconds(5);
         GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
-        Destroy(this.gameObject);
     }
+
 
     private void OnTriggerExit2D(Collider2D collision)
     {

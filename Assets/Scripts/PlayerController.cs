@@ -16,6 +16,10 @@ public class PlayerController : MonoBehaviour
 
     public float moveSpeed = 1.0f;
     Vector2 movement = Vector3.zero;
+    [SerializeField]
+    float acceleration = 3.0f;
+    [SerializeField]
+    float deceleration = 3.0f;
 
     public float dashMultiplier = 1.0f;
     float dashCooldown = 0.0f;
@@ -38,12 +42,12 @@ public class PlayerController : MonoBehaviour
     {
         if (!GameManager.Instance.IsGamePlaying()) return;
         
-        // If trying to move in the direction the sprite is not facing
+        /*// If trying to move in the direction the sprite is not facing
         if (movement.x != 0 && (movement.x < 0) != sr.flipX)
         {
             // Flip the sprite
             sr.flipX = !sr.flipX;
-        }
+        }*/
 
         // Update the dashes cooldown timer and the players color
         if (dashCooldown >= 0)
@@ -64,8 +68,19 @@ public class PlayerController : MonoBehaviour
 
         // Update the animation speed
         anim.SetFloat("Speed", movement.magnitude);
-        // Move the player according to the movement vector, the players speed, and whether or not the player was dashing
-        rb.MovePosition(rb.position + movement * (moveSpeed * dashMultiplier) * Time.fixedDeltaTime);
+        /*if (movement.sqrMagnitude > 0) 
+        {
+            // Move the player according to the movement vector, the players speed, and whether or not the player was dashing
+            //rb.MovePosition(rb.position + movement * (moveSpeed * dashMultiplier) * Time.fixedDeltaTime);
+            //rb.AddForce(movement * (moveSpeed * dashMultiplier) * Time.fixedDeltaTime, ForceMode2D.Impulse);
+
+            
+        }*/
+        Vector2 targetSpeed = movement * moveSpeed * dashMultiplier;
+        Vector2 speedDiff = targetSpeed - rb.velocity;
+        float accelRate = (targetSpeed.sqrMagnitude > 0.01f) ? acceleration * dashMultiplier : deceleration;
+        Vector2 forceVec = speedDiff * accelRate;
+        rb.AddForce(forceVec);
     }
 
     public void TriggerDash(InputAction.CallbackContext context)
@@ -117,7 +132,7 @@ public class PlayerController : MonoBehaviour
     {
         // Shake the screen
         CameraManager.Instance.ShakeScreen(0.1f, 0.1f);
-        SFXManager.Instance.PlayDashSFX(transform.position);
+        SFXManager.Instance.PlayDashSFX(transform.position, 0.75f);
         // Make the player invincible and "dashing"
         invincible = true;
         mat.SetFloat("_Opacity", 0.3f);
@@ -139,5 +154,15 @@ public class PlayerController : MonoBehaviour
         {
             Hurt(collision.gameObject.GetComponent<AIBase>().damage);
         }
+    }
+
+    public bool IsDashing() 
+    {
+        return isDashing;
+    }
+
+    public Vector2 GetMovement() 
+    {
+        return movement;
     }
 }

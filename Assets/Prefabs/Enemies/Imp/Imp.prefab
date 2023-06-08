@@ -185,8 +185,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5.5
   steeringScale: 0.15
-  health: 3
+  maxHealth: 3
   damage: 1
   screenShakeDuration: 0.05
-  screenShakeMagnitude: 2
+  screenShakeMagnitude: 4
   score: 50
+  lootPool:
+  - {fileID: 2676849056937721315, guid: 33167b1ccbbe0be4a972aada3a3a87b4, type: 3}

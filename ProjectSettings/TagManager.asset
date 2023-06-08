@@ -15,7 +15,7 @@ TagManager:
   - Water
   - UI
   - Enemy
-  - 
+  - Pickup
   - 
   - 
   - 
@@ -43,4 +43,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 1819524489
+    locked: 0
+  - name: Floor
+    uniqueID: 1230937283
     locked: 0

@@ -10,6 +10,16 @@ public class CameraManager : MonoBehaviour
     CinemachineBasicMultiChannelPerlin cinemachineBasicMultiChannelPerlin;
     [SerializeField]
     CinemachineTargetGroup targetGroup;
+    [SerializeField]
+    Transform targetTracker;
+    [SerializeField]
+    float kickbackResetDuration = 1.0f;
+    [SerializeField]
+    float kickbackResetTimer = 0;
+    [SerializeField]
+    bool kickbackComplete = true;
+    [SerializeField]
+    float kickbackResetScale = 0.5f;
 
     private void Awake()
     {
@@ -34,6 +44,16 @@ public class CameraManager : MonoBehaviour
                 cinemachineBasicMultiChannelPerlin.m_AmplitudeGain = 0;
             }
         }
+        if (kickbackResetTimer > 0)
+        {
+            kickbackResetTimer -= Time.deltaTime;
+            targetTracker.localPosition -= targetTracker.localPosition * kickbackResetScale;
+        }
+        else if (!kickbackComplete) 
+        {
+            kickbackComplete = true;
+            targetTracker.localPosition = Vector3Int.zero;
+        }
     }
 
     public void AddToTargetGroup(Transform objectTransform) 
@@ -44,5 +64,12 @@ public class CameraManager : MonoBehaviour
     public void RemoveFromTargetGroup(Transform objectTransform) 
     {
         targetGroup.RemoveMember(objectTransform);
+    }
+
+    public void Kickback(Vector2 kickbackDir) 
+    {
+        targetTracker.localPosition -= (Vector3)kickbackDir;
+        kickbackResetTimer = kickbackResetDuration;
+        kickbackComplete = false;
     }
 }

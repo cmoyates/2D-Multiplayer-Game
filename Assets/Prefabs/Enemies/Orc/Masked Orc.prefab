@@ -167,8 +167,14 @@ MonoBehaviour:
   maxHealth: 3
   damage: 1
   screenShakeDuration: 0.05
-  screenShakeMagnitude: 0.05
+  screenShakeMagnitude: 4
   score: 0
+  lootPool:
+  - {fileID: 2676849056937721315, guid: 33167b1ccbbe0be4a972aada3a3a87b4, type: 3}
+  - {fileID: 2676849056937721315, guid: 33167b1ccbbe0be4a972aada3a3a87b4, type: 3}
+  - {fileID: 2676849056937721315, guid: 33167b1ccbbe0be4a972aada3a3a87b4, type: 3}
+  - {fileID: 2676849056937721315, guid: 33167b1ccbbe0be4a972aada3a3a87b4, type: 3}
+  - {fileID: 541035622807719154, guid: 883613b728afa3145ad436636f10d343, type: 3}
   state: 2
   lineOfSightLayerMask:
     serializedVersion: 2

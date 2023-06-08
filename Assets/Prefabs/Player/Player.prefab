@@ -77,11 +77,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4a32b88ef333fe4d842590207c4e8ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aim: {x: 0, y: 0}
   isKeyboard: 1
   bulletPrefab: {fileID: 733663524299769148, guid: a096cd73365b3374a963b1610b7ef66c, type: 3}
   bulletForce: 65
   screenShakeDuration: 0.05
   screenShakeMagnitude: 0.5
+  playerRB: {fileID: 8005630984796561612}
+  recoilMultiplier: 2
 --- !u!1 &7574169059386688059
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,7 +205,7 @@ Transform:
   m_Children:
   - {fileID: 4633366017761729980}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8005630984796561601
 SpriteRenderer:
@@ -271,6 +274,8 @@ MonoBehaviour:
   screenShakeDuration: 0.05
   screenShakeMagnitude: 1
   moveSpeed: 5
+  acceleration: 20
+  deceleration: 20
   dashMultiplier: 1
   dashCooldownScale: 1
 --- !u!114 &8005630984796561613

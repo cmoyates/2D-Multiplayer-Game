@@ -20,6 +20,10 @@ public class GamePlayUI : MonoBehaviour
     [SerializeField]
     GameObject heartPrefab;
     int playerMaxHealth = -1;
+    [SerializeField]
+    Transform upgradeNameListParent;
+    [SerializeField]
+    GameObject upgradeNameListItem;
 
     // Start is called before the first frame update
     void Start()
@@ -28,6 +32,7 @@ public class GamePlayUI : MonoBehaviour
         
         PlayerManager.Instance.OnHealthChanged += PlayerManager_OnHealthChanged;
         PlayerManager.Instance.OnScoreChanged += PlayerManager_OnScoreChanged;
+        PlayerManager.Instance.OnUpgradeAdded += PlayerManager_OnUpgradeAdded;
 
         playerMaxHealth = PlayerManager.Instance.GetMaxHealth();
 
@@ -44,10 +49,17 @@ public class GamePlayUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    private void PlayerManager_OnUpgradeAdded(object sender, System.EventArgs e)
+    {
+        UpgradePickupSO upgrade = (UpgradePickupSO)sender;
+        TMP_Text upgradeNameText = Instantiate(upgradeNameListItem, upgradeNameListParent).GetComponent<TMP_Text>();
+        upgradeNameText.text = upgrade.name;
+    }
+
     private void Update()
     {
         Vector3 dir = endRoomPos - playerTransform.position;
-        float angle = Vector3.Angle(Vector3.up, dir);
+        float angle = Vector3.SignedAngle(Vector3.up, dir, Vector3.forward);
         compassImage.rectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 

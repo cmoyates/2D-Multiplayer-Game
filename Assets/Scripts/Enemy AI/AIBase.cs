@@ -20,6 +20,7 @@ public abstract class AIBase : MonoBehaviour
     public float screenShakeMagnitude = 0.05f;
     public int score;
     protected Vector2 movement = Vector2.zero;
+    public GameObject[] lootPool;
 
     // Start is called before the first frame update
     protected void Start()
@@ -76,10 +77,11 @@ public abstract class AIBase : MonoBehaviour
         Time.timeScale = 0;
         yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime * 3);
         Time.timeScale = 1;
-        //Instantiate(explosionPrefab, transform.position, Quaternion.Euler(90, 0, 0));
+        //Instantiate(explosionPrefab, transform.position, Quaternion.identity);
         PlayerManager.Instance.AddScore(score);
         EnemyManager.Instance.EnemyKilled();
         CameraManager.Instance.RemoveFromTargetGroup(transform);
+        Instantiate(lootPool[Random.Range(0, lootPool.Length)], transform.position, Quaternion.identity);
         Destroy(gameObject);
         yield return null;
     }

@@ -188,5 +188,10 @@ MonoBehaviour:
   maxHealth: 5
   damage: 3
   screenShakeDuration: 0.05
-  screenShakeMagnitude: 2
+  screenShakeMagnitude: 4
   score: 300
+  lootPool:
+  - {fileID: 3139852461907972129, guid: 5ff339f9c31516e4c90ca6657ba92cdc, type: 3}
+  - {fileID: 2676849056937721315, guid: 33167b1ccbbe0be4a972aada3a3a87b4, type: 3}
+  - {fileID: 2676849056937721315, guid: 33167b1ccbbe0be4a972aada3a3a87b4, type: 3}
+  - {fileID: 2676849056937721315, guid: 33167b1ccbbe0be4a972aada3a3a87b4, type: 3}
