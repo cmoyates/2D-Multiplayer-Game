@@ -7,7 +7,7 @@ public class OrcAI : AIBase
     private enum State 
     {
         Hunting,
-        Charging,
+        Attacking,
         Stunned
     }
 
@@ -54,11 +54,11 @@ public class OrcAI : AIBase
                 {
                     SFXManager.Instance.PlayDashSFX(transform.position);
                     playerDir = (playerTransform.position - transform.position).normalized;
-                    state = State.Charging;
+                    state = State.Attacking;
                 }
 
                 break;
-            case State.Charging:
+            case State.Attacking:
                 movement = playerDir * moveSpeed * chargeSpeedMul;
                 rb.velocity = movement;
 
@@ -88,7 +88,7 @@ public class OrcAI : AIBase
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (state == State.Charging && collision.collider.CompareTag("LevelCollision")) 
+        if (state == State.Attacking && collision.collider.CompareTag("LevelCollision")) 
         {
             state = State.Stunned;
             rb.drag = chargeBounceDrag;

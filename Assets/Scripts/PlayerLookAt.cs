@@ -15,13 +15,11 @@ public class PlayerLookAt : MonoBehaviour
     PlayerController playerController;
     [SerializeField]
     Rigidbody2D playerRB;
-    [SerializeField]
-    float recoilMultiplier = 5.0f;
+    public float recoilMultiplier = 5.0f;
     SpriteRenderer playerSR;
     Animator playerAnim;
     bool playerAnimForward = true;
-    [SerializeField]
-    float kickbackMul =  1.0f;
+    public float kickbackMul =  1.0f;
 
     // Start is called before the first frame update
     void Start()

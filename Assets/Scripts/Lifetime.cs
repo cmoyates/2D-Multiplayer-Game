@@ -6,17 +6,14 @@ public class Lifetime : MonoBehaviour
 {
     [SerializeField]
     float lifetime = 5.0f;
+    float currentLifetime = 0;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Update()
     {
-        StartCoroutine("LifetimeCoroutine");
-    }
-
-    IEnumerator LifetimeCoroutine()
-    {
-        yield return new WaitForSeconds(5);
-        
-        Destroy(this.gameObject);
+        currentLifetime += Time.deltaTime;
+        if (currentLifetime >= lifetime) 
+        {
+            Destroy(this.gameObject);
+        }
     }
 }

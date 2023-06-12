@@ -26,6 +26,8 @@ public class EnemyManager : MonoBehaviour
     float playerSafeRadius = 3.0f;
     [SerializeField]
     int currentEnemyCount = 0;
+    [SerializeField]
+    GameObject boss;
 
     private void Awake()
     {
@@ -64,16 +66,29 @@ public class EnemyManager : MonoBehaviour
                 validSpawnPosFound = Vector3.Distance(playerTransform.position, spawnPos) >= playerSafeRadius;
             }
 
-            int enemyIndex = UnityEngine.Random.Range(0, enemies.Length);
-            if (enemyCosts[enemyIndex] > remainingCost) 
+            int availableEnemies = enemies.Length;
+            int enemyIndex = UnityEngine.Random.Range(0, availableEnemies);
+            while (enemyCosts[enemyIndex] > remainingCost) 
             {
-                remainingCost = 0;
-                continue;
+                availableEnemies--;
+                
+                if (availableEnemies == 0) 
+                {
+                    return;
+                }
+                enemyIndex = UnityEngine.Random.Range(0, availableEnemies);
             }
             remainingCost -= enemyCosts[enemyIndex];
             Transform enemyTransform = Instantiate(enemies[enemyIndex], spawnPos, Quaternion.identity).transform;
             CameraManager.Instance.AddToTargetGroup(enemyTransform);
             currentEnemyCount++;
         }
+    }
+
+    public void SpawnBoss(Bounds bounds) 
+    {
+        Transform enemyTransform = Instantiate(boss, bounds.center, Quaternion.identity).transform;
+        CameraManager.Instance.AddToTargetGroup(enemyTransform);
+        currentEnemyCount++;
     }
 }

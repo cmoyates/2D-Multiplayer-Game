@@ -1,20 +1,36 @@
-
-!!! NORMALIZE ROOM TRIGGERS !!!
-
-Compass bug
-Map
 Pause Menu
 
 red corners when player damaged
-chest / mimic
-coins
+mimic
+
+Powerups:
+- Cannot shoot, damage by dodging into enemies
+- Gravity well
+- Teather
+- Auto aim?
+- Shotgun
+- Poison damage
+- Shield Hearts
+-- Extra heart regens out of battle
+-- Blue
 
 Enemies
 - Charger that speeds up after every charge
-- Stationary turret enemy
+- Orc Shaman 
+-- Archvile from doom
+--- spawn red translucent masked orc ghosts 
+- Pumpkin head
+-- run away dodge bullets 
+-- doesn't count towards unlock 
+--- will despawn if last alive drops
+- Wogol
+-- Moving turret / bullety enemies from gungeon
+- Snail Boss
+-- Leaves goop trail
+--- Faster on goop
+--- Player takes damage over time on goop
+-- Lots of health
 
-Make compass point to next room in path instead of just end room
-End room teleports to boss room (black fade)
 Boss: Red Orc
 - Large
 - Only damage when stunned

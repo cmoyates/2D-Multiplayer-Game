@@ -34,7 +34,9 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField]
     Tilemap debugTilemap;
     [SerializeField]
-    Tile debugTile;
+    Tile redTile;
+    [SerializeField]
+    Tile greyTile;
     Vector2Int offset;
     [SerializeField]
     Tilemap[] levelTilemaps;
@@ -42,6 +44,7 @@ public class LevelGenerator : MonoBehaviour
     RuleTile[] levelRuleTiles;
     bool levelGenStarted = false;
     int[] startAndEndIndices = new int[2];
+    Vector2[] mstPoints;
 
     // Start is called before the first frame update
     void Start()
@@ -125,19 +128,12 @@ public class LevelGenerator : MonoBehaviour
         {
             roomRect.SetActive(false);
         }
-        PlaceRoomTiles();
         PlaceHallwayTiles();
+        PlaceRoomTiles();
+        SetupRooms();
         PopulateTilemap();
 
-        debugTilemap.ClearAllTiles();
-
-        GameObject startRoom = mainRoomRects[startAndEndIndices[0]];
-        LevelManager.Instance.endRoom = mainRoomRects[startAndEndIndices[1]];
-        LevelManager.Instance.endRoom.GetComponent<RoomScript>().isEndRoom = true;
-        // Might need to change this later
-        Destroy(startRoom.GetComponent<RoomScript>());
-        Destroy(startRoom.GetComponent<BoxCollider2D>());
-        PlayerManager.Instance.SpawnPlayerAtPos(startRoom.transform.position);
+        //debugTilemap.ClearAllTiles();
         GameManager.Instance.StartCountdown();
     }
 
@@ -202,9 +198,10 @@ public class LevelGenerator : MonoBehaviour
 
     void GetStartAndEnd() 
     {
-        Vector2[] mstPoints = mainRoomRects.Select(rect => (Vector2)rect.transform.position).ToArray();
+        mstPoints = mainRoomRects.Select(rect => (Vector2)rect.transform.position).ToArray();
         startAndEndIndices =  MST.GetFarthestPoints(mstEdges, mstPoints);
         Debug.Log("From " + mainRoomRects[startAndEndIndices[0]].name + " to " + mainRoomRects[startAndEndIndices[1]].name);
+
     }
 
     void GetHallwayLines() 
@@ -280,29 +277,71 @@ public class LevelGenerator : MonoBehaviour
 
     void PlaceRoomTiles() 
     {
-        foreach (var roomRect in spawnedRects)
+        string endRoomName = mainRoomRects[startAndEndIndices[1]].name;
+        for (int i = 0; i < spawnedRects.Length; i++)
         {
+            GameObject roomRect = spawnedRects[i];
             if (!roomRect.activeInHierarchy) continue;
 
-            // Get the collider of the rectangle and its bounds
-            BoxCollider2D rectCol = roomRect.GetComponent<BoxCollider2D>();
-            Bounds bounds = rectCol.bounds;
+            // Get the bounds of the rectangles collider
+            Bounds bounds = roomRect.GetComponent<BoxCollider2D>().bounds;
+
+            Vector2Int minIntVec = new Vector2Int(Mathf.FloorToInt(bounds.min.x), Mathf.FloorToInt(bounds.min.y));
+            Vector2Int maxIntVec = new Vector2Int(Mathf.FloorToInt(bounds.max.x), Mathf.FloorToInt(bounds.max.y));
 
             // Place a floor tile everywhere on the floor tilemap that the rectangle overlaps
-            for (int x = Mathf.RoundToInt(bounds.min.x); x < Mathf.RoundToInt(bounds.max.x); x++)
+            for (int x = minIntVec.x; x < maxIntVec.x; x++)
             {
-                for (int y = Mathf.RoundToInt(bounds.min.y); y < Mathf.RoundToInt(bounds.max.y); y++)
+                for (int y = minIntVec.y; y < maxIntVec.y; y++)
                 {
-                    debugTilemap.SetTile(new Vector3Int(x, y, 0), debugTile);
+                    Tile tile = roomRect.name.Equals(endRoomName) ? redTile : greyTile;
+                    debugTilemap.SetTile(new Vector3Int(x, y), tile);
                 }
             }
 
-            // Cleanup the roomRect object
+            roomRect.transform.position = new Vector3((maxIntVec.x - minIntVec.x) / 2.0f + minIntVec.x, (maxIntVec.y - minIntVec.y + 1) / 2.0f + minIntVec.y);
+        }
+    }
+
+    void SetupRooms() 
+    {
+        List<MST.Edge>[] edgesFromPoints = MST.GetEdgesFromPointsArray(mstEdges, mstPoints);
+
+        int[] stepsFromStart = MST.GetStepsFromPoint(startAndEndIndices[0], edgesFromPoints);
+        bool[] isLeafArray = MST.GetIsLeafArray(edgesFromPoints);
+
+        LevelManager.Instance.maxSteps = Mathf.Max(stepsFromStart);
+
+        for (int i = 0; i < mainRoomRects.Length; i++)
+        {
+            GameObject roomRect = mainRoomRects[i];
+            
+            // Get rid of the level gen rect script
             Destroy(roomRect.GetComponent<LevelGenRect>());
-            roomRect.AddComponent<RoomScript>();
+            // 
+            RoomScript roomScript = roomRect.AddComponent<RoomScript>();
+            roomScript.steps = stepsFromStart[i];
+            roomScript.leafRoom = isLeafArray[i];
+            roomScript.isEndRoom = startAndEndIndices[1] == i;
+
+            BoxCollider2D rectCol = roomRect.GetComponent<BoxCollider2D>();
             rectCol.isTrigger = true;
+            rectCol.size += Vector2.up;
             rectCol.size -= Vector2.one * 2;
         }
+
+        // Set up some stuff for the start and end rooms
+        GameObject startRoom = mainRoomRects[startAndEndIndices[0]];
+
+        LevelManager.Instance.LockRoom(startRoom, false);
+        LevelManager.Instance.UnlockRoom();
+
+        PlayerManager.Instance.SpawnPlayerAtPos(startRoom.transform.position);
+        // Might need to change this later
+        Destroy(startRoom.GetComponent<RoomScript>());
+        Destroy(startRoom.GetComponent<BoxCollider2D>());
+
+        LevelManager.Instance.endRoom = mainRoomRects[startAndEndIndices[1]];
     }
 
     void PlaceHallwayTiles() 
@@ -318,7 +357,7 @@ public class LevelGenerator : MonoBehaviour
                 {
                     for (int y = -hallwayWidth; y < 1 + hallwayWidth; y++)
                     {
-                        debugTilemap.SetTile(new Vector3Int(x, y + Mathf.RoundToInt(hallwayLines[i][0].y), 0), debugTile);
+                        debugTilemap.SetTile(new Vector3Int(x, y + Mathf.RoundToInt(hallwayLines[i][0].y), 0), greyTile);
                     }
                 }
             }
@@ -330,7 +369,7 @@ public class LevelGenerator : MonoBehaviour
                 {
                     for (int y = minYPoint - 2; y < maxYPoint + 3; y++)
                     {
-                        debugTilemap.SetTile(new Vector3Int(x + Mathf.RoundToInt(hallwayLines[i][0].x), y, 0), debugTile);
+                        debugTilemap.SetTile(new Vector3Int(x + Mathf.RoundToInt(hallwayLines[i][0].x), y, 0), greyTile);
                     }
                 }
             }
@@ -358,8 +397,6 @@ public class LevelGenerator : MonoBehaviour
 
         HashSet<Vector2Int> outputTilePositions = new HashSet<Vector2Int>();
 
-
-
         foreach (var tilePos in inputTilePositions)
         {
             outputTilePositions.Add(tilePos);
@@ -386,9 +423,5 @@ public class LevelGenerator : MonoBehaviour
                 levelTilemaps[i].SetTile((Vector3Int)tilePos, levelRuleTiles[i]);
             }
         }
-
-        debugTilemap.gameObject.SetActive(false);
-
-        //validPosList = new List<Vector2Int>(inputTilePositions);
     }
 }

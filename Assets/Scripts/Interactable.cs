@@ -9,7 +9,17 @@ public abstract class Interactable : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!(oneTimeUse && used) && collision.collider.CompareTag("Player")) 
+        TryInteract(collision.collider);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        TryInteract(collision);
+    }
+
+    void TryInteract(Collider2D col) 
+    {
+        if (!(oneTimeUse && used) && col.CompareTag("Player"))
         {
             used = true;
             Interaction();

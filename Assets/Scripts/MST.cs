@@ -87,21 +87,21 @@ public class MST
         return output;
     }
 
-    public static int[] GetFarthestPoints(Edge[] mstEdges, Vector2[] points) 
+    public static List<Edge>[] GetEdgesFromPointsArray(Edge[] mstEdges, Vector2[] points) 
     {
         // Initialize an array of lists to store the lists of edges that include the point at the index
         List<Edge>[] edgesFromPoints = new List<Edge>[points.Length];
-        
+
         // For each point given
         for (int i = 0; i < points.Length; i++)
         {
             // Initialize a list of edges to hold the edges that include the point
             List<Edge> edgesFromPoint = new List<Edge>();
             // For each edge
-            for (int j = 0; j < mstEdges.Length; j++) 
+            for (int j = 0; j < mstEdges.Length; j++)
             {
                 // If either the src or dest has is the same as the point index
-                if (mstEdges[j].src == i || mstEdges[j].dest == i) 
+                if (mstEdges[j].src == i || mstEdges[j].dest == i)
                 {
                     // Add it to the list
                     edgesFromPoint.Add(mstEdges[j]);
@@ -110,6 +110,14 @@ public class MST
             // Add the list to the array of lists
             edgesFromPoints[i] = edgesFromPoint;
         }
+
+        return edgesFromPoints;
+    }
+
+    public static int[] GetFarthestPoints(Edge[] mstEdges, Vector2[] points) 
+    {
+        // Initialize an array of lists to store the lists of edges that include the point at the index
+        List<Edge>[] edgesFromPoints = GetEdgesFromPointsArray(mstEdges, points);
 
         int[] farthestPoints = new int[2] { -1, -1 };
         float farthestDistance = 0.0f;
@@ -164,5 +172,85 @@ public class MST
         }
 
         return (farthestIndex, farthestDistance);
+    }
+
+    public static float[] GetDistancesFromPoint(int startIndex, List<Edge>[] edgesArray)
+    {
+        Queue<int> queue = new Queue<int>();
+        queue.Enqueue(startIndex);
+
+        Dictionary<int, float> distancesDict = new Dictionary<int, float>();
+        distancesDict[startIndex] = 0f;
+
+        while (queue.Count > 0)
+        {
+            int current = queue.Dequeue();
+
+            foreach (Edge edge in edgesArray[current])
+            {
+                int otherPointIndex = (edge.src == current) ? edge.dest : edge.src;
+                if (!distancesDict.ContainsKey(otherPointIndex))
+                {
+                    float distance = distancesDict[current] + edge.weight;
+                    distancesDict[otherPointIndex] = distance;
+
+                    queue.Enqueue(otherPointIndex);
+                }
+            }
+        }
+
+        float[] distances = new float[edgesArray.Length];
+        for (int i = 0; i < edgesArray.Length; i++)
+        {
+            distances[i] = distancesDict[i];
+        }
+
+        return distances;
+    }
+
+    public static bool[] GetIsLeafArray(List<Edge>[] edgesArray) 
+    {
+        bool[] isLeafArray = new bool[edgesArray.Length];
+
+        for (int i = 0; i < edgesArray.Length; i++)
+        {
+            isLeafArray[i] = edgesArray[i].Count < 2;
+        }
+
+        return isLeafArray;
+    }
+
+    public static int[] GetStepsFromPoint(int startIndex, List<Edge>[] edgesArray)
+    {
+        Queue<int> queue = new Queue<int>();
+        queue.Enqueue(startIndex);
+
+        Dictionary<int, int> stepsDict = new Dictionary<int, int>();
+        stepsDict[startIndex] = 0;
+
+        while (queue.Count > 0)
+        {
+            int current = queue.Dequeue();
+            int currentSteps = stepsDict[current];
+
+            foreach (Edge edge in edgesArray[current])
+            {
+                int otherPointIndex = (edge.src == current) ? edge.dest : edge.src;
+                if (!stepsDict.ContainsKey(otherPointIndex))
+                {
+                    stepsDict[otherPointIndex] = currentSteps + 1;
+
+                    queue.Enqueue(otherPointIndex);
+                }
+            }
+        }
+
+        int[] stepsArray = new int[edgesArray.Length];
+        for (int i = 0; i < edgesArray.Length; i++)
+        {
+            stepsArray[i] = stepsDict[i];
+        }
+
+        return stepsArray;
     }
 }

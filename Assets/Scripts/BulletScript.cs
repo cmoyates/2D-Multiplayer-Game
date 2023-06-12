@@ -5,6 +5,8 @@ using UnityEngine;
 public class BulletScript : MonoBehaviour
 {
     Collider2D col;
+    [SerializeField]
+    bool isEnemyBullet = false;
 
     // Start is called before the first frame update
     void Start()
@@ -18,19 +20,27 @@ public class BulletScript : MonoBehaviour
     {
         if (GameManager.Instance.IsGameOver())
         {
-            GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
             Destroy(this.gameObject);
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("Enemy"))
+        if (isEnemyBullet)
         {
-            collision.collider.GetComponent<AIBase>().Hurt();
+            if (collision.collider.CompareTag("Player"))
+            {
+                collision.collider.GetComponent<PlayerController>().Hurt(1);
+            }
+        }
+        else 
+        {
+            if (collision.collider.CompareTag("Enemy"))
+            {
+                collision.collider.GetComponent<AIBase>().Hurt();
+            }
         }
 
-        GameManager.Instance.OnStateChanged -= GameManager_OnStateChanged;
         Destroy(this.gameObject);
     }
 

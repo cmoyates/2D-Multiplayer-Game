@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
     public float screenShakeDuration = 0.05f;
     public float screenShakeMagnitude = 0.05f;
+    public float dashShakeMagnitude = 0.05f;
 
     public float moveSpeed = 1.0f;
     Vector2 movement = Vector3.zero;
@@ -131,7 +132,7 @@ public class PlayerController : MonoBehaviour
     public IEnumerator Dash()
     {
         // Shake the screen
-        CameraManager.Instance.ShakeScreen(0.1f, 0.1f);
+        CameraManager.Instance.ShakeScreen(screenShakeDuration, dashShakeMagnitude);
         SFXManager.Instance.PlayDashSFX(transform.position, 0.75f);
         // Make the player invincible and "dashing"
         invincible = true;

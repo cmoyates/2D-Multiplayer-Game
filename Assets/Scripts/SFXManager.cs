@@ -14,6 +14,7 @@ public class SFXManager : MonoBehaviour
     public AudioClip pickupCoinClip;
     public AudioClip pickupUpgradeClip;
     public AudioClip pickupHealthClip;
+    public AudioClip teleportClip;
 
     private void Awake()
     {
@@ -60,6 +61,11 @@ public class SFXManager : MonoBehaviour
         PlayClipAtPoint(pickupHealthClip, pos, volume, sfxMixer);
     }
     public void PlayPickupUpgradeClip(Vector3 pos, float volume = 1.0f)
+    {
+        PlayClipAtPoint(pickupUpgradeClip, pos, volume, sfxMixer);
+    }
+
+    public void PlayTeleportClip(Vector3 pos, float volume = 1.0f)
     {
         PlayClipAtPoint(pickupUpgradeClip, pos, volume, sfxMixer);
     }

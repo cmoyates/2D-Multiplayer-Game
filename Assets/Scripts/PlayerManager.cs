@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -17,6 +18,13 @@ public class PlayerManager : MonoBehaviour
     int score = 0;
     GameObject player;
     Rigidbody2D playerRB;
+    PlayerController playerController;
+    PlayerLookAt playerLookAt;
+    SpriteRenderer playerSR;
+    int primaryDamage = 1;
+    [SerializeField]
+    GameObject specialBulletPrefab;
+
 
     private void Awake()
     {
@@ -30,6 +38,9 @@ public class PlayerManager : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player");
         playerRB = player.GetComponent<Rigidbody2D>();
+        playerController = player.GetComponent<PlayerController>();
+        playerLookAt = player.GetComponentInChildren<PlayerLookAt>();
+        playerSR = player.GetComponent<SpriteRenderer>();
 
         GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
     }
@@ -92,6 +103,12 @@ public class PlayerManager : MonoBehaviour
         OnHealthChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    public void AddMaxHealth(int additionalHealth) 
+    {
+        maxHealth += additionalHealth;
+        health = maxHealth;
+        OnHealthChanged?.Invoke(this, EventArgs.Empty);
+    }
     #endregion
 
     public void SpawnPlayerAtPos(Vector3 pos) 
@@ -104,5 +121,36 @@ public class PlayerManager : MonoBehaviour
     {
         Debug.Log("Upgrade Collected: " + newUpgrade.name);
         OnUpgradeAdded.Invoke(newUpgrade, EventArgs.Empty);
+
+        switch (newUpgrade.upgradeType)
+        {
+            case UpgradePickupSO.UpgradeType.Attack:
+                primaryDamage++;
+                break;
+            case UpgradePickupSO.UpgradeType.Movement:
+                playerController.moveSpeed *= 1.25f;
+                break;
+            case UpgradePickupSO.UpgradeType.Defence:
+                AddMaxHealth(1);
+                break;
+            case UpgradePickupSO.UpgradeType.Special:
+                primaryDamage += 5;
+                playerSR.color = Color.red;
+                playerLookAt.bulletForce = 120;
+                playerLookAt.screenShakeMagnitude = 4;
+                playerLookAt.bulletPrefab = specialBulletPrefab;
+                playerLookAt.recoilMultiplier = 20;
+                playerLookAt.kickbackMul = 4;
+                playerController.moveSpeed *= 1.5f;
+                playerController.dashCooldownScale *= 4;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public int GetPrimaryDamage() 
+    {
+        return primaryDamage;
     }
 }

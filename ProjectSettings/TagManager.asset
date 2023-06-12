@@ -16,7 +16,7 @@ TagManager:
   - UI
   - Enemy
   - Pickup
-  - 
+  - Map
   - 
   - 
   - 
@@ -49,4 +49,7 @@ TagManager:
     locked: 0
   - name: Floor
     uniqueID: 1230937283
+    locked: 0
+  - name: Map
+    uniqueID: 3538290795
     locked: 0

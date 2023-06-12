@@ -56,18 +56,19 @@ public class GamePlayUI : MonoBehaviour
         upgradeNameText.text = upgrade.name;
     }
 
-    private void Update()
+    /*private void Update()
     {
         Vector3 dir = endRoomPos - playerTransform.position;
         float angle = Vector3.SignedAngle(Vector3.up, dir, Vector3.forward);
         compassImage.rectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
-    }
+    }*/
 
     private void GameManager_OnStateChanged(object sender, System.EventArgs e)
     {
         if (GameManager.Instance.IsGamePlaying())
         {
             endRoomPos = LevelManager.Instance.endRoom.transform.position;
+
             // Show
             gameObject.SetActive(true);
         }

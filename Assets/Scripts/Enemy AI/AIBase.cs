@@ -9,18 +9,19 @@ public abstract class AIBase : MonoBehaviour
     public float steeringScale;
     protected Rigidbody2D rb;
     protected Vector2Int gridOffset;
-    SpriteRenderer sr;
-    Animator anim;
+    protected SpriteRenderer sr;
+    protected Animator anim;
     public int maxHealth = 3;
     protected int health = 3;
     public int damage = 1;
     Material mat;
-    Collider2D col;
+    protected Collider2D col;
     public float screenShakeDuration = 0.05f;
     public float screenShakeMagnitude = 0.05f;
     public int score;
     protected Vector2 movement = Vector2.zero;
     public GameObject[] lootPool;
+    public bool dropEntireLootPool = false;
 
     // Start is called before the first frame update
     protected void Start()
@@ -62,7 +63,7 @@ public abstract class AIBase : MonoBehaviour
 
     public void Hurt()
     {
-        health--;
+        health -= PlayerManager.Instance.GetPrimaryDamage();
         SFXManager.Instance.PlayHurtSFX(transform.position);
         StartCoroutine(health <= 0 ? "Die" : "TakeDamage");
     }
@@ -81,7 +82,17 @@ public abstract class AIBase : MonoBehaviour
         PlayerManager.Instance.AddScore(score);
         EnemyManager.Instance.EnemyKilled();
         CameraManager.Instance.RemoveFromTargetGroup(transform);
-        Instantiate(lootPool[Random.Range(0, lootPool.Length)], transform.position, Quaternion.identity);
+        if (dropEntireLootPool)
+        {
+            foreach (var item in lootPool) 
+            {
+                Instantiate(item, transform.position + (Vector3)RandomUnitVector(), Quaternion.identity);
+            }
+        }
+        else 
+        {
+            Instantiate(lootPool[Random.Range(0, lootPool.Length)], transform.position + (Vector3)RandomUnitVector(), Quaternion.identity);
+        }
         Destroy(gameObject);
         yield return null;
     }
@@ -102,5 +113,12 @@ public abstract class AIBase : MonoBehaviour
         if (directions[3]) { pathfindDir.x += 1; }
         // Normalize the vector so the enemies aren't faster diagonally and multiply by the movement speed
         return pathfindDir.normalized;
+    }
+
+    // http://answers.unity.com/answers/1668907/view.html
+    public Vector2 RandomUnitVector()
+    {
+        float random = Random.Range(0f, Mathf.PI);
+        return new Vector2(Mathf.Cos(random), Mathf.Sin(random));
     }
 }

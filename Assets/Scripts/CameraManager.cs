@@ -20,11 +20,29 @@ public class CameraManager : MonoBehaviour
     bool kickbackComplete = true;
     [SerializeField]
     float kickbackResetScale = 0.5f;
+    [SerializeField]
+    CompositeCollider2D tilemapCollider;
+    [SerializeField]
+    Camera mapCamera;
 
     private void Awake()
     {
         Instance = this;
         cinemachineBasicMultiChannelPerlin = GetComponent<CinemachineVirtualCamera>().GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+    }
+
+    private void Start()
+    {
+        GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+    }
+
+    private void GameManager_OnStateChanged(object sender, System.EventArgs e)
+    {
+        if (GameManager.Instance.IsGamePlaying()) 
+        {
+            mapCamera.transform.position = tilemapCollider.bounds.center + Vector3Int.back * 10;
+            mapCamera.orthographicSize = Mathf.Max(tilemapCollider.bounds.extents.x, tilemapCollider.bounds.extents.y);
+        }
     }
 
     // The coroutine that shakes the camera
